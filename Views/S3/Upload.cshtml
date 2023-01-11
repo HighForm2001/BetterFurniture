@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<h1>Upload Images</h1>
+
+<center>
+    <h1>Upload Furniture Picture to S3:</h1>
+    <br />
+    <hr />
+    <br />
+    <form asp-action="ProcessUploadImage" asp-controller="S3" method="post"
+          enctype="multipart/form-data">
+        Choose your flower picture: <input type="file" name="imagefile" accept="image/*" multiple />
+        <br /><br />
+        <input type="submit" name="submit" value="Upload image to S3!" />
+    </form>
+</center>
