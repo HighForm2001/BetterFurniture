@@ -36,6 +36,18 @@ namespace BetterFurniture.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "your full name")]
+            public string CustomerFullName { get; set; }
+
+            [Display(Name = "your age")]
+            public int CustomerAge { get; set; }
+
+            [Display(Name = "your address")]
+            public string CustomerAddress { get; set; }
+
+            [Display(Name = "your date of birth")]
+            public DateTime CustomerDOB { get; set; }
         }
 
         private async Task LoadAsync(BetterFurnitureUser user)
