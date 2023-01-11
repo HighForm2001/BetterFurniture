@@ -1,0 +1,22 @@
+﻿@model List<Amazon.S3.Model.S3Object> 
+@{ 
+    ViewData["Title"] = "Display";
+}
+<h1>Uploaded Images</h1>
+
+<center>
+    @foreach(var img in Model)
+            {
+        string imageURL = "https://" + img.BucketName + ".s3.amazonaws.com/" + img.Key;
+        <div style="text-align:center; background-color:beige;width:200px;height:200px;margin:50px;display:inline-block">
+            <div style="width:100px;height:100px;padding:5px">
+                <img src="@imageURL" width="200" height="200" />
+            </div>
+            <div>
+                <form asp-action="DeleteImage" asp-route-imgName="@img.Key">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </form>
+            </div>
+        </div>
+            }
+</center>
