@@ -5,7 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon; // connect AWS account
 using Amazon.S3; // bucket library
-using Amazon.S3.Model; 
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using Microsoft.Extensions.Configuration; // for appsettings.json
 using System.IO; // input and output
 using Microsoft.AspNetCore.Http;
@@ -13,7 +14,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BetterFurniture.Controllers
 {
-    public class S3Controller : Controller
+    public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
 
@@ -38,6 +39,7 @@ namespace BetterFurniture.Controllers
         {
             List<string> values = getValues();
             var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
+            //var s3Client = new AmazonS3Client(RegionEndpoint.USEast1);
             return s3Client;
         }
 
@@ -68,6 +70,8 @@ namespace BetterFurniture.Controllers
                 // upload img to S3 and get URL
                 try
                 {
+                    
+                    
                     // upload to s3
                     PutObjectRequest request = new PutObjectRequest // generate request
                     {
@@ -78,7 +82,7 @@ namespace BetterFurniture.Controllers
                     };
 
                     // send request
-                    await s3client.PutObjectAsync(request);
+                     await s3client.PutObjectAsync(request);
                 }
                 catch (AmazonS3Exception ex)
                 {
@@ -91,7 +95,7 @@ namespace BetterFurniture.Controllers
             }
 
             // return to upload page
-            return RedirectToAction("Display", "S3");
+            return RedirectToAction("Display", "InventoryManagement");
         }
 
         // step 3: display image from s3 as gallery
@@ -146,7 +150,7 @@ namespace BetterFurniture.Controllers
             {
                 return BadRequest("Error message: " + ex.Message);
             }
-            return RedirectToAction("Display", "S3");
+            return RedirectToAction("Display", "InventoryManagement");
         }
 
         public IActionResult Upload()
