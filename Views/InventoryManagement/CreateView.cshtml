@@ -5,13 +5,13 @@
 @if (ViewBag.Msg != null)
             {
                 <script>
-                    alert("@ViewBag.ErrorMessage");
+                    alert("@ViewBag.Msg");
                 </script>
             }
 <h1>CreateView</h1>
 
 <center>
-
+    <span style="color:crimson">ViewBag msg: @ViewBag.Msg</span>
     <form asp-action="Create" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
         <table border="1">
             <tr>

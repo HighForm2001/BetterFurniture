@@ -34,11 +34,11 @@ namespace BetterFurniture.Controllers
         {
             return View();
         }
-        public IActionResult EditView()
+        public IActionResult EditView(int id)
         {
-            return View();
+            Models.Furniture furniture_to_edit = _repository.GetByID(id);
+            return View(furniture_to_edit);
         }
-
         // create product - need further improvement, like
         // need id, name, description, quantity, images
         [HttpPost]
@@ -47,8 +47,8 @@ namespace BetterFurniture.Controllers
             var s3client = connect();
             if (_repository.GetByName(furniture.Name) != null)
             {
-                ViewBag.Msg = "Existing furniture name: " + furniture.Name;
-                return RedirectToAction("CreateView", "InventoryManagement");
+                string msg = "Existing furniture name: " + furniture.Name;
+                return RedirectToAction("CreateView", "InventoryManagement", new { Msg = msg});
             }
             foreach (var img in imageFile)
             {
