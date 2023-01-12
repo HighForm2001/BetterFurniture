@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BetterFurniture
 {
@@ -25,6 +26,8 @@ namespace BetterFurniture
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddDbContext<Data.FurnitureContext>(options => options.UseSqlServer(Configuration.GetConnectionString("BetterFurnitureContextConnection")));
+            services.AddScoped<Models.Repositories.FurnitureRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

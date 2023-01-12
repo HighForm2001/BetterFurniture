@@ -17,6 +17,98 @@ namespace BetterFurniture.Controllers
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
+        private readonly Models.Repositories.FurnitureRepository _repository;
+
+        // inject connection to the database
+        public InventoryManagementController(Models.Repositories.FurnitureRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public IActionResult Index()
+        {
+            var furniture = _repository.GetAll();
+            return View(furniture);
+        }
+        public IActionResult CreateView()
+        {
+            return View();
+        }
+        public IActionResult EditView()
+        {
+            return View();
+        }
+
+        // create product - need further improvement, like
+        // need id, name, description, quantity, images
+        [HttpPost]
+        public async Task<IActionResult> Create(Models.Furniture furniture, List<IFormFile> imageFile)
+        {
+            var s3client = connect();
+            if (_repository.GetByName(furniture.Name) != null)
+            {
+                ViewBag.Msg = "Existing furniture name: " + furniture.Name;
+                return RedirectToAction("CreateView", "InventoryManagement");
+            }
+            foreach (var img in imageFile)
+            {
+                if (img.Length <= 0)
+                {
+                    return BadRequest("Empty file. Failed to upload!");
+                }
+                else if (!img.ContentType.ToLower().StartsWith("image/")) // check file type
+                {
+                    return BadRequest("Not a image type. Failed to upload!" + "Image type: " + img.ContentType.ToLower());
+                }
+
+                // upload img to S3 and get URL
+                try
+                {
+
+                    // upload to s3
+                    PutObjectRequest request = new PutObjectRequest // generate request
+                    {
+                        InputStream = img.OpenReadStream(),
+                        BucketName = s3name + "/images",
+                        Key = img.FileName,
+                        CannedACL = S3CannedACL.PublicRead
+                    };
+
+                    // send request
+                    await s3client.PutObjectAsync(request);
+                    furniture.ImageUrls = furniture.ImageUrls + "https://" + s3name + ".s3.amazonaws.com/images/" + img.FileName + ",";
+                }
+                catch (AmazonS3Exception ex)
+                {
+                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
+                }
+
+            }
+            furniture.ImageUrls = furniture.ImageUrls.Substring(0,furniture.ImageUrls.Length-1);
+            _repository.Add(furniture);
+            Console.WriteLine("Added successfully");
+            return RedirectToAction("Index", "InventoryManagement");
+        }
+
+        // edit product
+        [HttpPost]
+        public IActionResult Edit(Models.Furniture furniture)
+        {
+            _repository.Update(furniture);
+            return RedirectToAction("Index", "InventoryManagement");
+        }
+
+        // delete product
+        public IActionResult Delete(int id)
+        {
+            _repository.Delete(id);
+            return RedirectToAction("Index", "InventoryManagement");
+        }
+
 
         // step 1: get string for connection to AWS account
         private List<string> getValues()
