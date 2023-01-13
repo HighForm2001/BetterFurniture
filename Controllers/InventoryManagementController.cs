@@ -156,6 +156,8 @@ namespace BetterFurniture.Controllers
         }
 
         // update image
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<string> update_images(List<IFormFile> imageFile, string furniture_name, string furnitureUrl)
         {
             string url = "";
@@ -234,61 +236,8 @@ namespace BetterFurniture.Controllers
             return s3Client;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        // step 2: upload image to s3 and generate the url to store in DB
-        public async Task<IActionResult> ProcessUploadImage(List<IFormFile> imageFile)
-        {
-            // get credential
-            var s3client = connect();
-
-            // read each image and store to s3
-            if (imageFile == null)
-            {
-                return BadRequest("You did not submit any file.");
-            }
-            foreach (var img in imageFile)
-            {
-                if (img.Length <= 0)
-                {
-                    return BadRequest("Empty file. Failed to upload!");
-                }
-                else if (!img.ContentType.ToLower().StartsWith("image/")) // check file type
-                {
-                    return BadRequest("Not a image type. Failed to upload!" + "Image type: " + img.ContentType.ToLower());
-                }
-
-                // upload img to S3 and get URL
-                try{
-                
-                    // upload to s3
-                    PutObjectRequest request = new PutObjectRequest // generate request
-                    {
-                        InputStream = img.OpenReadStream(),
-                        BucketName = s3name + "/images",
-                        Key = img.FileName,
-                        CannedACL = S3CannedACL.PublicRead
-                    };
-
-                    // send request
-                     await s3client.PutObjectAsync(request);
-                }
-                catch (AmazonS3Exception ex)
-                {
-                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
-                }
-            }
-
-            // return to upload page
-            return RedirectToAction("Display", "InventoryManagement");
-        }
         
-
-        // function 4: delete image
+        
         public async Task<string> DeleteImage(string imgUrl, string name)
         {
             // add credential
@@ -314,9 +263,6 @@ namespace BetterFurniture.Controllers
             return "Successful";
         }
 
-        public IActionResult Upload()
-        {
-            return View("Upload");
-        }
+       
     }
 }
