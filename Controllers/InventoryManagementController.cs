@@ -221,9 +221,9 @@ namespace BetterFurniture.Controllers
             IConfigurationRoot config = builder.Build(); // build the json file
 
             // read info from json using config instance
-            values.Add(config["S3:id"]);
-            values.Add(config["S3:key"]);
-            values.Add(config["S3:token"]);
+            values.Add(config["AWS:id"]);
+            values.Add(config["AWS:key"]);
+            values.Add(config["AWS:token"]);
 
             return values;
         }
@@ -232,7 +232,6 @@ namespace BetterFurniture.Controllers
         {
             List<string> values = getValues();
             var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
-            //var s3Client = new AmazonS3Client(RegionEndpoint.USEast1);
             return s3Client;
         }
 
