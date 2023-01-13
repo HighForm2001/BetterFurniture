@@ -9,6 +9,7 @@
    <table>
        <thead>
            <tr>
+               <th>ID</th>
                <th>Name</th>
                <th>Description</th>
                <th>Price</th>
@@ -21,11 +22,14 @@
            @foreach(var furniture in Model)
             {
                 <tr>
+                    <td>@furniture.ID</td>
                     <td>@furniture.Name</td>
                     <td>@furniture.Description</td>
                     <td>@furniture.Price</td>
                     <td>@furniture.Quantity</td>
-                    <td>@furniture.ImageUrls</td>
+                    <td>@foreach (var url in furniture.ImageUrls.Split(",")) {
+                        <img src="@url" width="200" height="200"/>
+                    }</td>
                     <td>
                         <a asp-action="EditView" asp-controller="InventoryManagement" asp-route-id ="@furniture.ID">Edit</a>
                         <a asp-action="Delete" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Delete</a>

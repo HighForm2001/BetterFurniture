@@ -14,9 +14,9 @@ namespace BetterFurniture.Models.Repositories
             _context = context;
         }
         public List<Furniture> GetAll() { return _context.furnitures.ToList(); }
-        public Furniture GetByID(int id)
+        public async Task<Furniture> GetByID(int id)
         {
-            return _context.furnitures.Find(id);
+            return await _context.furnitures.FindAsync(id);
         }
         public Furniture GetByName(string name)
         {
@@ -49,9 +49,9 @@ namespace BetterFurniture.Models.Repositories
             _context.furnitures.Remove(product);
             _context.SaveChanges();
         }
-        public int GetQuantity(int id)
+        public async Task<int> GetQuantity(int id)
         {
-            Furniture furniture = GetByID(id);
+            Furniture furniture = await GetByID(id);
             return furniture.Quantity;
         }
     }

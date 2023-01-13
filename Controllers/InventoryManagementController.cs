@@ -30,37 +30,147 @@ namespace BetterFurniture.Controllers
             var furniture = _repository.GetAll();
             return View(furniture);
         }
-        public IActionResult CreateView()
+        public IActionResult CreateView(string? msg)
         {
+            if (msg != null)
+            {
+                ViewBag.Msg = msg;
+            }
             return View();
         }
-        public IActionResult EditView(int id)
+        public async Task<IActionResult> EditView(int id)
         {
-            Models.Furniture furniture_to_edit = _repository.GetByID(id);
+            ViewBag.Msg = "";
+            if (TempData["msg"] != null){
+                ViewBag.Msg = TempData["msg"] as string;
+            }
+            Console.WriteLine("ViewBag.msg = " + ViewBag.Msg);
+            Models.Furniture furniture_to_edit = await _repository.GetByID(id);
             return View(furniture_to_edit);
         }
-        // create product - need further improvement, like
-        // need id, name, description, quantity, images
+        // create product 
         [HttpPost]
         public async Task<IActionResult> Create(Models.Furniture furniture, List<IFormFile> imageFile)
         {
-            var s3client = connect();
             if (_repository.GetByName(furniture.Name) != null)
             {
-                string msg = "Existing furniture name: " + furniture.Name;
-                return RedirectToAction("CreateView", "InventoryManagement", new { Msg = msg});
+                string error = "Existing furniture name: " + furniture.Name;
+                return RedirectToAction("CreateView","InventoryManagement", new { Msg = error});
             }
+            if (imageFile.Count == 0)
+            {
+                string error = "Lack of information. Please fill in all information needed";
+                return RedirectToAction("CreateView", "InventoryManagement", new { Msg = error });
+            }
+            furniture.ImageUrls = await update_images(imageFile, furniture.Name, "");
+            if (ModelState.IsValid)
+            {
+                _repository.Add(furniture);
+                return RedirectToAction("Index", "InventoryManagement");
+            }
+            string msg = "Lack of information. Please fill in all information needed";
+            return RedirectToAction("CreateView", "InventoryManagement", new { Msg = msg });
+        }
+
+        // edit product
+        [HttpPost]
+        public async Task<IActionResult> Edit(Models.Furniture furniture, List<IFormFile> imageFile)
+        {
+            Console.WriteLine(imageFile.Count);
+            if (imageFile.Count > 0)
+            {
+                Console.WriteLine("furniture.ImageUrls" + furniture.Name);
+                string urls = await update_images(imageFile, furniture.Name,furniture.ImageUrls);
+                furniture.ImageUrls += ","+urls;
+                if (furniture.ImageUrls.EndsWith(','))
+                {
+                    Console.WriteLine("Remove the last ','");
+                    furniture.ImageUrls = furniture.ImageUrls[0..^1];
+                }
+                if (furniture.ImageUrls.StartsWith(","))
+                {
+                    furniture.ImageUrls = furniture.ImageUrls[1..];
+                }
+            }
+            if((furniture.ImageUrls == null) && (imageFile.Count == 0))
+            {
+                TempData["msg"] = "You need an image to display the product";
+                return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
+            }
+            if ((furniture.ImageUrls!= null) &&(furniture.ImageUrls.Contains("Error")))
+            {
+                TempData["msg"] = furniture.ImageUrls;
+                Console.WriteLine("TempData[msg] = " + TempData["msg"]);
+                return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
+            }
+            if (ModelState.IsValid)
+            {
+                _repository.Update(furniture);
+                return RedirectToAction("Index","InventoryManagement");
+            }
+            TempData["msg"] = "Please fill in all the information";
+            Console.WriteLine("TempData[msg] = " + TempData["msg"]);
+            return RedirectToAction("EditView","InventoryManagement",new { id = furniture.ID });
+        }
+
+        // delete product
+        public async Task<IActionResult> Delete(int id)
+        {
+            var furniture =await _repository.GetByID(id);
+            if (furniture.ImageUrls != null)
+            {
+                foreach (var url in furniture.ImageUrls.Split(","))
+                {
+                    await DeleteImage(url, furniture.Name);
+                }
+            }
+            
+            _repository.Delete(id);
+            return RedirectToAction("Index", "InventoryManagement");
+        }
+
+        // delete image url
+        [HttpPost]
+        public async Task<IActionResult> DeleteSingleImage(string imgUrl, int id)
+        {
+            // Delete the path from the ImageUrls property
+            Console.WriteLine("Delete Imae URL is called");
+            var furniture = await _repository.GetByID(id);
+            
+            if (furniture.ImageUrls.Length > 0){
+                furniture.ImageUrls = furniture.ImageUrls.Replace(imgUrl, "");
+                await DeleteImage(imgUrl,furniture.Name);
+                furniture.ImageUrls = furniture.ImageUrls.Replace(",,", ",");
+                if (furniture.ImageUrls.StartsWith(','))
+                {
+                    furniture.ImageUrls = furniture.ImageUrls[1..];
+                }
+                if (furniture.ImageUrls.EndsWith(','))
+                {
+                    furniture.ImageUrls = furniture.ImageUrls[0..^1];
+                }
+            }
+            
+            _repository.Update(furniture);
+            return RedirectToAction("EditView", "InventoryManagement", new { id });
+        }
+
+        // update image
+        public async Task<string> update_images(List<IFormFile> imageFile, string furniture_name, string furnitureUrl)
+        {
+            string url = "";
+
+            var s3client = connect();
             foreach (var img in imageFile)
             {
                 if (img.Length <= 0)
                 {
-                    return BadRequest("Empty file. Failed to upload!");
+                    return "Error: No image is submitted.";
                 }
                 else if (!img.ContentType.ToLower().StartsWith("image/")) // check file type
                 {
-                    return BadRequest("Not a image type. Failed to upload!" + "Image type: " + img.ContentType.ToLower());
+                    return "Error: Not a image type. Failed to upload!" + "Image type: " + img.ContentType.ToLower();
                 }
-
                 // upload img to S3 and get URL
                 try
                 {
@@ -69,47 +179,36 @@ namespace BetterFurniture.Controllers
                     PutObjectRequest request = new PutObjectRequest // generate request
                     {
                         InputStream = img.OpenReadStream(),
-                        BucketName = s3name + "/images",
+                        BucketName = s3name + "/images/" + furniture_name,
                         Key = img.FileName,
                         CannedACL = S3CannedACL.PublicRead
                     };
 
                     // send request
                     await s3client.PutObjectAsync(request);
-                    furniture.ImageUrls = furniture.ImageUrls + "https://" + s3name + ".s3.amazonaws.com/images/" + img.FileName + ",";
+                    string url_to_add = "https://" + s3name + ".s3.amazonaws.com/images/" + furniture_name + "/" + img.FileName;
+     /*               Console.WriteLine(furnitureUrl.Length > 0);*/
+
+                    if ( (furnitureUrl == null)|| (furnitureUrl.Length == 0))
+                    {
+                        Console.WriteLine("furnitureUrl is null");
+                        url +=  url_to_add + ",";
+                    }else if ((furnitureUrl != null) && (!furnitureUrl.Contains(url_to_add)))
+                    {
+                        url += url_to_add + ",";
+                    }
                 }
                 catch (AmazonS3Exception ex)
                 {
-                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
+                    return "Error: Failed to upload due to S3 issue. Error message: " + ex.Message;
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest("Failed to upload due to technical issue. Error message: " + ex.Message);
-                }
+                
 
             }
-            furniture.ImageUrls = furniture.ImageUrls.Substring(0,furniture.ImageUrls.Length-1);
-            _repository.Add(furniture);
-            Console.WriteLine("Added successfully");
-            return RedirectToAction("Index", "InventoryManagement");
+            if (url.Length>0)
+                url = url[0..^1];
+            return url;
         }
-
-        // edit product
-        [HttpPost]
-        public IActionResult Edit(Models.Furniture furniture)
-        {
-            _repository.Update(furniture);
-            return RedirectToAction("Index", "InventoryManagement");
-        }
-
-        // delete product
-        public IActionResult Delete(int id)
-        {
-            _repository.Delete(id);
-            return RedirectToAction("Index", "InventoryManagement");
-        }
-
-
         // step 1: get string for connection to AWS account
         private List<string> getValues()
         {
@@ -160,10 +259,8 @@ namespace BetterFurniture.Controllers
                 }
 
                 // upload img to S3 and get URL
-                try
-                {
-                    
-                    
+                try{
+                
                     // upload to s3
                     PutObjectRequest request = new PutObjectRequest // generate request
                     {
@@ -189,60 +286,32 @@ namespace BetterFurniture.Controllers
             // return to upload page
             return RedirectToAction("Display", "InventoryManagement");
         }
-
-        // step 3: display image from s3 as gallery
-        public async Task<IActionResult> Display()
-        {
-            // get credential
-            var s3client = connect();
-            List<S3Object> images = new List<S3Object>();
-            try
-            {
-                // s3 token, to tell if image still in S3
-                string token = null;
-
-                do
-                {
-                    //create list object request to S3
-                    ListObjectsRequest request = new ListObjectsRequest
-                    {
-                        BucketName = s3name
-                    };
-
-                    // get response of image from s3
-                    ListObjectsResponse response = await s3client.ListObjectsAsync(request).ConfigureAwait(false);
-                    images.AddRange(response.S3Objects);
-                    token = response.NextMarker;
-                } while (token != null);
-            }catch(AmazonS3Exception ex)
-            {
-                return BadRequest("Error: " + ex.Message);
-            }
-            return View(images);
-        }
+        
 
         // function 4: delete image
-        public async Task<IActionResult> DeleteImage(string imgName)
+        public async Task<string> DeleteImage(string imgUrl, string name)
         {
             // add credential
             var s3client = connect();
+            string imgName = imgUrl.Split("/").Last();
+            string folder = "/images/" + name + "";
             try
             {
                 // create a delete request
                 DeleteObjectRequest request = new DeleteObjectRequest
                 {
-                    BucketName = s3name,
+                    BucketName = s3name + folder,
                     Key = imgName
                 };
                 await s3client.DeleteObjectAsync(request);
             }catch(AmazonS3Exception ex)
             {
-                return BadRequest("Error message: " + ex.Message);
+                return "Error message: " + ex.Message;
             }catch(Exception ex)
             {
-                return BadRequest("Error message: " + ex.Message);
+                return "Error message: " + ex.Message;
             }
-            return RedirectToAction("Display", "InventoryManagement");
+            return "Successful";
         }
 
         public IActionResult Upload()

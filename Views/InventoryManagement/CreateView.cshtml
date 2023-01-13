@@ -1,17 +1,15 @@
-﻿@model Furniture 
+﻿@model Furniture
+
 @{
     ViewData["Title"] = "CreateView";
 }
-@if (ViewBag.Msg != null)
-            {
-                <script>
-                    alert("@ViewBag.Msg");
-                </script>
-            }
-<h1>CreateView</h1>
+
 
 <center>
-    <span style="color:crimson">ViewBag msg: @ViewBag.Msg</span>
+    <h1 style="border:solid;font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+        Create Furniture
+    </h1>
+    <span style="color:crimson">@ViewBag.Msg</span>
     <form asp-action="Create" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
         <table border="1">
             <tr>
@@ -45,7 +43,7 @@
             <tr>
                 <th>Furniture Images</th>
                 <td>
-                    <input type="file" name="imageFile" accept="image/*" multiple/>
+                    <input type="file" name="imageFile" accept="image/*" multiple />
                 </td>
             </tr>
         </table>
