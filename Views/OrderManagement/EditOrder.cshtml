@@ -30,7 +30,7 @@
             <tr>
                 <th>Shipping Address</th>
                 <td>
-                    <input asp-for="@Model.ShippingAddress" />
+                    <textarea asp-for="@Model.ShippingAddress"></textarea>
                     <span asp-validation-for="@Model.ShippingAddress" class="text-danger"></span>
                 </td>
             </tr>
@@ -63,10 +63,18 @@
                 </td>
 
             </tr>
-            <tr>    
+            <tr>
                 <th>Status</th>
                 <td>
-                    <input asp-for="@Model.Status"/>
+      
+                    <select asp-for="@Model.Status">
+                        <option value="Packed">Packed</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Returned">Returned</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
                     <span asp-validation-for="@Model.Status" class="text-danger"></span>
                 </td>
             </tr>

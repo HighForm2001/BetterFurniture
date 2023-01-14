@@ -33,7 +33,15 @@ namespace BetterFurniture.Controllers
         // order page
         public async Task<IActionResult> Index()
         {
-
+            if (TempData["msg"] != null)
+            {
+                string msg = (string)TempData["msg"];
+                if (msg.Contains("Succesfully"))
+                    ViewBag.color = "chartreuse";
+                else
+                    ViewBag.color = "red";
+                ViewBag.Msg = msg;
+            }
             List<Order> orders = await getOrders();
             if (orders == null)
             {
@@ -92,7 +100,35 @@ namespace BetterFurniture.Controllers
         {
             Console.WriteLine(order.ItemName);
             string msg = await update_dynamodb(order);
-            Console.WriteLine(msg);
+            TempData["msg"] = msg;
+            return RedirectToAction("Index", "OrderManagement");
+        }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            var client = connect();
+            try
+            {
+                Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+            {
+                {"OrderID",new AttributeValue{S=id } }
+            };
+                DeleteItemRequest request = new DeleteItemRequest
+                {
+                    TableName = tableName,
+                    Key = key
+                };
+                await client.DeleteItemAsync(request);
+            }catch(AmazonDynamoDBException ex)
+            {
+                TempData["msg"] = "Error: " + ex.Message;
+                return RedirectToAction("Index", "OrderManagement");
+            }catch(Exception ex)
+            {
+                TempData["msg"] = "Error: " + ex.Message;
+                return RedirectToAction("Index", "OrderManagement");
+            }
+            
             return RedirectToAction("Index", "OrderManagement");
         }
 
@@ -100,10 +136,6 @@ namespace BetterFurniture.Controllers
         public async Task<string> update_dynamodb(Order order)
         {
             var client = connect();
-            foreach(var word in order.ItemName)
-            {
-                Console.WriteLine(word);
-            }
             try
             {
                 Dictionary<string, AttributeValue> item = new Dictionary<string, AttributeValue>
