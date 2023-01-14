@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BetterFurniture.Areas.Identity.Pages.Account
 {
@@ -22,17 +23,28 @@ namespace BetterFurniture.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<BetterFurnitureUser> _signInManager;
         private readonly UserManager<BetterFurnitureUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+
+        public SelectList RoleSelectList = new SelectList(
+            new List<SelectListItem>
+                {
+                    new SelectListItem { Selected =true, Text = "Select Role", Value = ""},
+                    new SelectListItem { Selected =false, Text = "Admin", Value = "Admin"},
+                    new SelectListItem { Selected =false, Text = "Customer", Value = "Customer"},
+            }, "Value", "Text", 1);
 
         public RegisterModel(
             UserManager<BetterFurnitureUser> userManager,
             SignInManager<BetterFurnitureUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -70,6 +82,10 @@ namespace BetterFurniture.Areas.Identity.Pages.Account
             [Range (12,100, ErrorMessage = "Only 12 years old and above are allowed to register. ")]
             public int CustomerAge { get; set; }
 
+            [Required]
+            [Display(Name = "user ole")]
+            public string userrole { get; set; }
+
             //public string CustomerAddress { get; set; }
 
             //public DateTime CustomerDOB { get; set; }
@@ -92,11 +108,24 @@ namespace BetterFurniture.Areas.Identity.Pages.Account
                     Email = Input.Email ,
                     CustomerFullName = Input.CustomerFullName,
                     CustomerAge = Input.CustomerAge,
-                    EmailConfirmed = true 
+                    EmailConfirmed = true,
+                    userrole = Input.userrole
+
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                bool roleresult = await _roleManager.RoleExistsAsync("Admin");
+                if (!roleresult)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                }
+                roleresult = await _roleManager.RoleExistsAsync("Customer");
+                if (!roleresult)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("Customer"));
+                }
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, Input.userrole);
                     //_logger.LogInformation("User created a new account with password.");
 
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

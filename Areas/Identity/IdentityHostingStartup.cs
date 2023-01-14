@@ -21,6 +21,7 @@ namespace BetterFurniture.Areas.Identity
                         context.Configuration.GetConnectionString("BetterFurnitureContextConnection")));
 
                 services.AddDefaultIdentity<BetterFurnitureUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                     .AddEntityFrameworkStores<BetterFurnitureContext>();
             });
         }

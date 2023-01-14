@@ -20,5 +20,8 @@ namespace BetterFurniture.Areas.Identity.Data
         
         [PersonalData]
         public DateTime CustomerDOB { get; set; }
+
+        [PersonalData]
+        public string userrole { get; set; }
     }
 }
