@@ -1,7 +1,49 @@
-﻿
+﻿@model List<Furniture>;
+@using Newtonsoft.Json;
 @{
     ViewData["Title"] = "ProceedPayment";
 }
 
 <h1>ProceedPayment</h1>
 
+@if (Model.Count == 0)
+{
+    <h1>No item is selected.</h1>
+    <a asp-controller="Home" asp-action="Index">Go Back</a>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.ImageUrls.Split(",")[0]" width="200" height="200" />
+                    </td>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>@item.Price</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"></td>
+                <td>Total:@ViewBag.total_price</td>
+            </tr>
+        </tfoot>
+    </table>
+    <form asp-action="FinishPayment" method="post">
+        <input type="submit" value="Pay!" class="btn btn-primary submit-btn" style="float: right; margin-right: 10px; margin-bottom: 10px;" asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-customerName="@ViewBag.customerName"/>
+    </form>
+
+}

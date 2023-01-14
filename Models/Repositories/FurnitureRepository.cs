@@ -7,9 +7,9 @@ namespace BetterFurniture.Models.Repositories
 {
     public class FurnitureRepository
     {
-        private readonly Data.FurnitureContext _context;
+        private readonly FurnitureContext _context;
 
-        public FurnitureRepository(Data.FurnitureContext context)
+        public FurnitureRepository(FurnitureContext context)
         {
             _context = context;
         }
