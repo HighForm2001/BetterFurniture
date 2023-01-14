@@ -10,17 +10,18 @@ using Amazon.S3.Transfer;
 using Microsoft.Extensions.Configuration; // for appsettings.json
 using System.IO; // input and output
 using Microsoft.AspNetCore.Http;
-
+using BetterFurniture.Models.Repositories;
+using BetterFurniture.Models;
 
 namespace BetterFurniture.Controllers
 {
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
-        private readonly Models.Repositories.FurnitureRepository _repository;
+        private readonly FurnitureRepository _repository;
 
         // inject connection to the database
-        public InventoryManagementController(Models.Repositories.FurnitureRepository repository)
+        public InventoryManagementController(FurnitureRepository repository)
         {
             _repository = repository;
         }
@@ -50,7 +51,7 @@ namespace BetterFurniture.Controllers
         }
         // create product 
         [HttpPost]
-        public async Task<IActionResult> Create(Models.Furniture furniture, List<IFormFile> imageFile)
+        public async Task<IActionResult> Create(Furniture furniture, List<IFormFile> imageFile)
         {
             if (_repository.GetByName(furniture.Name) != null)
             {
@@ -74,7 +75,7 @@ namespace BetterFurniture.Controllers
 
         // edit product
         [HttpPost]
-        public async Task<IActionResult> Edit(Models.Furniture furniture, List<IFormFile> imageFile)
+        public async Task<IActionResult> Edit(Furniture furniture, List<IFormFile> imageFile)
         {
             Console.WriteLine(imageFile.Count);
             if (imageFile.Count > 0)

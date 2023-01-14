@@ -1,4 +1,6 @@
-﻿@model Cart
+﻿@model Cart;
+@using Newtonsoft.Json;
+
 @{
     ViewData["Title"] = "CartPage";
 }
@@ -13,38 +15,38 @@
 }
 else
 {
-<center>
-    <h1>CartPage for @Model.CustomerName:</h1>
-    <hr />
-    <br />
-    <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
-    <table>
-        <tr>
-            <th>Item Name</th>
-            <th>Remove</th>
-        </tr>
-        @foreach (var item in Model.ItemName)
-        {
+    <center>
+        <h1>CartPage for @Model.CustomerName:</h1>
+        <hr />
+        <br />
+        <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
+        <table>
             <tr>
-                <td>@item</td>
-                <td>
-                    <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
-                        <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName ="@item" asp-route-customerName="@Model.CustomerName">Remove</button>
-                    </form>
-                </td>
+                <th>Item Name</th>
+                <th>Remove</th>
             </tr>
-        }
-        <tr>
-            <th>Total Price</th>
-            <td>@Model.total_price</td>
-        </tr>
-    </table>
-    <form asp-action="ProceedPayment" asp-controller="Payment">
-        <button type="submit" asp-route-customerName="@Model.CustomerName" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
-    </form>
-    
-</center>
-}   
+            @foreach (var item in Model.ItemName)
+            {
+                <tr>
+                    <td>@item</td>
+                    <td>
+                        <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
+                            <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-customerName="@Model.CustomerName">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <th>Total Price</th>
+                <td>@Model.total_price</td>
+            </tr>
+        </table>
+        <form asp-action="ProceedPayment" asp-controller="Payment">
+            <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
+        </form>
+
+    </center>
+}
 
 
 
