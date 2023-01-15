@@ -15,6 +15,7 @@ namespace BetterFurniture.Models
         public string CustomerEmail { get; set; }
         public List<string> ItemName { get; set; }
         public string Status { get; set; }
+        public decimal TotalPrice { get; set; }
         public IEnumerable<SelectListItem> ItemNameList
         {
             get { return ItemName.Select(i => new SelectListItem { Text = i, Value = i }); }

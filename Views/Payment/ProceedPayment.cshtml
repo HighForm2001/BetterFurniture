@@ -42,8 +42,9 @@ else
             </tr>
         </tfoot>
     </table>
-    <form asp-action="FinishPayment" method="post">
-        <input type="submit" value="Pay!" class="btn btn-primary submit-btn" style="float: right; margin-right: 10px; margin-bottom: 10px;" asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-customerName="@ViewBag.customerName"/>
+    <form asp-action="FinishPayment" asp-controller="Payment" method="post">
+        <input type="submit" value="Pay!" class="btn btn-primary submit-btn" style="float: right; margin-right: 10px; margin-bottom: 10px;"
+               asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-total="@ViewBag.total_price" asp-action="FinishPayment" asp-controller="Payment"/>
     </form>
 
 }

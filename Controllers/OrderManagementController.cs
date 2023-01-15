@@ -10,13 +10,23 @@ using Amazon.DynamoDBv2.DocumentModel;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using BetterFurniture.Models;
+using Microsoft.AspNetCore.Authorization;
+using BetterFurniture.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace BetterFurniture.Controllers
 {
+    
     public class OrderManagementController : Controller
     {
         private const string tableName = "BetterFurnitureOrder";
-        
+        private readonly UserManager<BetterFurnitureUser> _userManager;
+
+        public OrderManagementController(UserManager<BetterFurnitureUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
         private AmazonDynamoDBClient connect()
         {
             List<string> keys = new List<string>();
@@ -31,6 +41,7 @@ namespace BetterFurniture.Controllers
         }
 
         // order page
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             if (TempData["msg"] != null)
@@ -73,6 +84,7 @@ namespace BetterFurniture.Controllers
                     order.CustomerPhone = item["CustomerPhone"].S;
                     order.ItemName = item["ItemName"].L.Select(av => av.S).ToList();
                     order.Status = item["Status"].S;
+                    order.TotalPrice = decimal.Parse(item["TotalPrice"].N);
                     orders.Add(order);
                 }
             }
@@ -84,6 +96,7 @@ namespace BetterFurniture.Controllers
         }
 
         // edit page
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditOrder(string id)
         {
             List<Order> orders =await getOrders();
@@ -96,12 +109,27 @@ namespace BetterFurniture.Controllers
             return View();
         }
 
+
         public async Task<IActionResult> processEditOrder(Order order)
         {
             Console.WriteLine(order.ItemName);
             string msg = await update_dynamodb(order);
             TempData["msg"] = msg;
             return RedirectToAction("Index", "OrderManagement");
+        }
+
+        public async Task<IActionResult> OrderStatus()
+        {
+            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+            string userName = user.CustomerFullName;
+            List<Order> selected_orders = new List<Order>();
+            List<Order> all_orders = await getOrders();
+            foreach(var order in all_orders)
+            {
+                if (order.CustomerName.Equals(userName))
+                    selected_orders.Add(order);
+            }
+            return View(selected_orders);
         }
 
         public async Task<IActionResult> Delete(string id)
@@ -146,7 +174,8 @@ namespace BetterFurniture.Controllers
                     { "CustomerEmail",new AttributeValue{S=order.CustomerEmail } },
                     { "CustomerPhone",new AttributeValue{S=order.CustomerPhone } },
                     { "Status",new AttributeValue{S=order.Status } },
-                    { "ItemName",new AttributeValue{L=order.ItemName.Select(x=>new AttributeValue{S=x }).ToList() } }
+                    { "ItemName",new AttributeValue{L=order.ItemName.Select(x=>new AttributeValue{S=x }).ToList() } },
+                    {"TotalPrice",new AttributeValue{N=order.TotalPrice.ToString()} }
                 };
                // List<string> test = item["ItemName"].L.Select(av => av.S).ToList();
                 

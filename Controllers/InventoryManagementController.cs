@@ -12,9 +12,11 @@ using System.IO; // input and output
 using Microsoft.AspNetCore.Http;
 using BetterFurniture.Models.Repositories;
 using BetterFurniture.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BetterFurniture.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";

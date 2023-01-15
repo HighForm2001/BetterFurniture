@@ -20,6 +20,7 @@
                 <th>Customer Phone</th>
                 <th>Status</th>
                 <th>Order Item(s)</th>
+                <th>Total Price</th>
                 <th>Action</th>
             </tr>
             @foreach (var item in Model)
@@ -41,6 +42,7 @@
                             }
                         </ul>
                     </td>
+                    <td>@item.TotalPrice</td>
                     <td>
                         <a asp-action="EditOrder" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Edit</a>
                         <a asp-action="Delete" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Delete</a>

@@ -8,10 +8,13 @@ using Newtonsoft.Json;
 using BetterFurniture.Models.Repositories;
 using Amazon.DynamoDBv2;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication;
 using System.IO;
 using Amazon;
 using Amazon.DynamoDBv2.Model;
 using BetterFurniture.Areas.Identity.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace BetterFurniture.Controllers
 {
@@ -20,20 +23,23 @@ namespace BetterFurniture.Controllers
         private const string orderTable = "BetterFurnitureOrder";
         private const string cartTable = "BetterFurnitureCart";
         private readonly FurnitureRepository _repository;
+        private readonly UserManager<BetterFurnitureUser> _userManager;
 
         // inject connection to the database
-        public PaymentController(FurnitureRepository repository)
+        public PaymentController(FurnitureRepository repository, UserManager<BetterFurnitureUser> userManager)
         {
             _repository = repository;
+            _userManager = userManager;
         }
 
         public IActionResult ProceedPayment(string cart)
         {
             Cart cart_to_proceed = JsonConvert.DeserializeObject<Cart>(cart);
+            Console.WriteLine(cart_to_proceed.CustomerName);
             List<Furniture> all_furnitures = _repository.GetAll();
             List<Furniture> selected_furnitures = new List<Furniture>();
             ViewBag.total_price = cart_to_proceed.total_price;
-            ViewBag.customerName = cart_to_proceed.CustomerName;
+
             foreach(var item_name in cart_to_proceed.ItemName)
             {
                 selected_furnitures.Add(all_furnitures.Find(x => x.Name.Equals(item_name)));
@@ -41,17 +47,19 @@ namespace BetterFurniture.Controllers
             return View(selected_furnitures);
         }
         
-        public IActionResult FinishPayment(string furnitures, string customerName)
+        public async Task<IActionResult> FinishPayment(string furnitures, string total)
         {
             List<Furniture> paid_furnitures = JsonConvert.DeserializeObject<List<Furniture>>(furnitures);
-            ViewBag.Msg = createOrder(paid_furnitures);
+            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+            ViewBag.Msg = await createOrder(paid_furnitures, user, decimal.Parse(total));
             return View();
         }
-        public async Task<string> createOrder(List<Furniture> furnitures, BetterFurnitureUser user)
+        public async Task<string> createOrder(List<Furniture> furnitures, BetterFurnitureUser user, decimal totalPrice)
         {
             var client = connect();
             //create unique id 
             string uniqueId = Guid.NewGuid().ToString();
+            
             try
             {
                 Dictionary<string, AttributeValue> item = new Dictionary<string, AttributeValue>
@@ -59,10 +67,11 @@ namespace BetterFurniture.Controllers
                     { "OrderID",new AttributeValue{S=uniqueId} },
                     {"CustomerName",new AttributeValue{S=user.CustomerFullName} },
                     { "ShippingAddress",new AttributeValue{S=user.CustomerAddress } },
-                    { "CustomerEmail",new AttributeValue{S="Sample123@email.com" } }, // need to edit
-                    { "CustomerPhone",new AttributeValue{S="0123456789" } }, // need to edit
+                    { "CustomerEmail",new AttributeValue{S=user.Email } }, // need to edit
+                    { "CustomerPhone",new AttributeValue{S=user.PhoneNumber } }, // need to edit
                     { "Status",new AttributeValue{S="Packed" } },
-                    { "ItemName",new AttributeValue{L=furnitures.Select(x=>new AttributeValue{S=x.Name }).ToList() } }
+                    { "ItemName",new AttributeValue{L=furnitures.Select(x=>new AttributeValue{S=x.Name }).ToList() } },
+                     {"TotalPrice",new AttributeValue{N=totalPrice.ToString()} }
                 };
                 // List<string> test = item["ItemName"].L.Select(av => av.S).ToList();
 
@@ -72,11 +81,28 @@ namespace BetterFurniture.Controllers
                     Item = item
                 };
                 await client.PutItemAsync(request);
-                foreach(var furniture in furnitures)
+
+                Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+                    {
+                        {"CustomerName",new AttributeValue{S=user.CustomerFullName } }
+                    };
+                DeleteItemRequest delete_request = new DeleteItemRequest
                 {
-                    furniture.Quantity -= 1;
+                    TableName = cartTable,
+                    Key = key
+                };
+                await client.DeleteItemAsync(delete_request);
+                var furnitureCount = furnitures.GroupBy(f => f.Name)
+                                .Select(g => new { FurnitureName = g.Key, Quantity = g.Count() })
+                                .ToList();
+                foreach (var furniture_item in furnitureCount)
+                {
+                    var furniture = _repository.GetByName(furniture_item.FurnitureName);
+                    furniture.Quantity -= furniture_item.Quantity;
                     _repository.Update(furniture);
                 }
+
+                       
             }
             catch (AmazonDynamoDBException ex)
             {

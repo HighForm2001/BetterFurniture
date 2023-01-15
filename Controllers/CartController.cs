@@ -1,9 +1,14 @@
 ﻿using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using BetterFurniture.Areas.Identity.Data;
 using BetterFurniture.Models;
+using BetterFurniture.Models.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,9 +17,18 @@ using System.Threading.Tasks;
 
 namespace BetterFurniture.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private const string tableName = "BetterFurnitureCart";
+        private readonly FurnitureRepository _repository;
+        private readonly UserManager<BetterFurnitureUser> _userManager;
+
+        public CartController(FurnitureRepository repository, UserManager<BetterFurnitureUser> userManager)
+        {
+            _repository = repository;
+            _userManager = userManager;
+        }
 
         private AmazonDynamoDBClient connect()
         {
@@ -60,11 +74,17 @@ namespace BetterFurniture.Controllers
 
         public async Task<IActionResult> CartPage()
         {
-            string customerName = "Chin";
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string customerName = user.CustomerFullName;
             List<Cart> carts = await getCarts();
             Cart cart = carts.Find(x => x.CustomerName.Equals(customerName));
             if (cart == null)
                 ViewBag.Msg = "Your cart is empty. Add some product into your cart now!";
+            else
+            {
+                cart = update_cart_total_price(cart);
+                await update_cart(cart);
+            }
             if (TempData["msg"] != null)
             {
                 string modifyMsg = (string)TempData["msg"];
@@ -74,31 +94,34 @@ namespace BetterFurniture.Controllers
                     ViewBag.color = "red";
                 ViewBag.modifyMsg = modifyMsg;
             }
-            return View(cart);
+            var cart_view = new CartViewModel
+            {
+                Cart = cart,
+                Furniture = _repository.GetAll()
+            };
+            return View(cart_view);
         }
-        public async Task<IActionResult> RemoveFromCart(string itemName, string customerName)
+        public async Task<IActionResult> RemoveFromCart(string itemName, string cart_passed)
         {
-            List<Cart> carts = await getCarts();
-            Console.WriteLine(customerName);
-            Console.WriteLine(itemName);
-            Cart cart = carts.Find(x => x.CustomerName.Equals(customerName));
+            Cart cart = JsonConvert.DeserializeObject<Cart>(cart_passed);
             Console.WriteLine(cart.ItemName);
             
             cart.ItemName.Remove(itemName);
             if (cart.ItemName.Count == 0)
             {
-                await Delete(customerName);
+                await Delete(cart);
             }
             else
             {
                 // manage here so it deduct the total price correctly
-                cart.total_price -= 10;
+                cart = update_cart_total_price(cart);
                 string msg = await update_cart(cart);
                 TempData["msg"] = msg;
                 
             }
             return RedirectToAction("CartPage", "Cart");
         }
+
         [HttpPost]
         public async Task<string> update_cart(Cart cart)
         {
@@ -126,9 +149,20 @@ namespace BetterFurniture.Controllers
             return "Updated Cart Succesfully";
         }
 
-        public async Task<string> Delete(string id)
+        public Cart update_cart_total_price(Cart cart)
+        {
+            cart.total_price = 0;
+            foreach(var item in cart.ItemName)
+            {
+                cart.total_price += _repository.GetByName(item).Price;
+            }
+            return cart;
+        }
+
+        public async Task<string> Delete(Cart cart)
         {
             var client = connect();
+            string id = cart.CustomerName;
             try
             {
                 Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>

@@ -1,4 +1,4 @@
-﻿@model Cart;
+﻿@model CartViewModel;
 @using Newtonsoft.Json;
 
 @{
@@ -16,33 +16,36 @@
 else
 {
     <center>
-        <h1>CartPage for @Model.CustomerName:</h1>
+        <h1>CartPage for @Model.Cart.CustomerName:</h1>
         <hr />
         <br />
         <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
         <table>
             <tr>
                 <th>Item Name</th>
-                <th>Remove</th>
+                <th>Price</th>
+                <th></th>
             </tr>
-            @foreach (var item in Model.ItemName)
+            @foreach (var item in Model.Cart.ItemName)
             {
+                var furniture = Model.Furniture.FirstOrDefault(f => f.Name.Equals(item));
                 <tr>
                     <td>@item</td>
+                    <td>@furniture.Price</td>
                     <td>
                         <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
-                            <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-customerName="@Model.CustomerName">Remove</button>
+                            <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-cart_passed="@JsonConvert.SerializeObject(Model.Cart)">Remove</button>
                         </form>
                     </td>
                 </tr>
             }
             <tr>
                 <th>Total Price</th>
-                <td>@Model.total_price</td>
+                <td>@Model.Cart.total_price</td>
             </tr>
         </table>
         <form asp-action="ProceedPayment" asp-controller="Payment">
-            <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
+            <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
         </form>
 
     </center>
