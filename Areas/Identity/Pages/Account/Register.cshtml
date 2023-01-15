@@ -37,16 +37,21 @@
                 <input asp-for="Input.CustomerAge" class="form-control" />
                 <span asp-validation-for="Input.CustomerAge" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-                <label asp-for="Input.CustomerAddress"></label>
-                <input asp-for="Input.CustomerAddress" class="form-control" />
-                <span asp-validation-for="Input.CustomerAddress" class="text-danger"></span>
-            </div>
             <div class="form-group">
-                <label asp-for="Input.CustomerDOB"></label>
-                <input asp-for="Input.CustomerDOB" class="form-control" />
-                <span asp-validation-for="Input.CustomerDOB" class="text-danger"></span>
-            </div>*@
+                <lable asp-for="Input.userrole"></lable>
+                <select asp-for="Input.userrole" asp-items="Model.RoleSelectList"></select>
+                <span asp-validation-for="Input.userrole" class=" text-danger"></span>
+            </div>
+            @*<div class="form-group">
+            <label asp-for="Input.CustomerAddress"></label>
+            <input asp-for="Input.CustomerAddress" class="form-control" />
+            <span asp-validation-for="Input.CustomerAddress" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.CustomerDOB"></label>
+            <input asp-for="Input.CustomerDOB" class="form-control" />
+            <span asp-validation-for="Input.CustomerDOB" class="text-danger"></span>
+        </div>*@
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>

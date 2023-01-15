@@ -4,14 +4,16 @@ using BetterFurniture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BetterFurniture.Migrations
 {
     [DbContext(typeof(BetterFurnitureContext))]
-    partial class BetterFurnitureContextModelSnapshot : ModelSnapshot
+    [Migration("20230114072049_modifytablewithUserRole")]
+    partial class modifytablewithUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
