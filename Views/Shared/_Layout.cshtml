@@ -24,13 +24,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="InventoryManagement" asp-action="InventoryOverview">InventoryManagement</a>
+                        </li>
                         @if (User.IsInRole("Admin"))
                         {
+
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="InventoryManagement" asp-action="Index">InventoryManagement</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="OrderManagement" asp-action="Index">OrderManagement</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="OrderManagement" asp-action="OrderOverview">OrderManagement</a>
                             </li>
                         }
                         <li class="nav-item">

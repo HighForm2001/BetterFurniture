@@ -154,9 +154,37 @@ namespace BetterFurniture.Controllers
             cart.total_price = 0;
             foreach(var item in cart.ItemName)
             {
+                Console.WriteLine("Item = " + item);
                 cart.total_price += _repository.GetByName(item).Price;
             }
             return cart;
+        }
+
+        public async Task<IActionResult> AddToCart(string itemName)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        public async Task<IActionResult> AddToCartFromDetail(string itemName)
+        {
+            Console.WriteLine("Item name at line 169: " + itemName);
+            List<Cart> carts = await getCarts();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            string customerName = user.CustomerFullName;
+            Cart cart = carts.Find(x => x.CustomerName.Equals(customerName));
+            if (cart == null)
+            {
+                cart = new Cart
+                {
+                    CustomerName = customerName,
+                    ItemName = new List<string>(),
+                    total_price = 0
+                };
+                // create a new cart for this customer
+            }
+            cart.ItemName.Add(itemName);
+            cart = update_cart_total_price(cart);
+            string msg = await update_cart(cart);
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<string> Delete(Cart cart)

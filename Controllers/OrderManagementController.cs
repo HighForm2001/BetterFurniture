@@ -42,7 +42,7 @@ namespace BetterFurniture.Controllers
 
         // order page
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> OrderOverview()
         {
             if (TempData["msg"] != null)
             {
@@ -115,7 +115,7 @@ namespace BetterFurniture.Controllers
             Console.WriteLine(order.ItemName);
             string msg = await update_dynamodb(order);
             TempData["msg"] = msg;
-            return RedirectToAction("Index", "OrderManagement");
+            return RedirectToAction("OrderOverview", "OrderManagement");
         }
 
         public async Task<IActionResult> OrderStatus()
@@ -150,14 +150,14 @@ namespace BetterFurniture.Controllers
             }catch(AmazonDynamoDBException ex)
             {
                 TempData["msg"] = "Error: " + ex.Message;
-                return RedirectToAction("Index", "OrderManagement");
+                return RedirectToAction("OrderOverview", "OrderManagement");
             }catch(Exception ex)
             {
                 TempData["msg"] = "Error: " + ex.Message;
-                return RedirectToAction("Index", "OrderManagement");
+                return RedirectToAction("OrderOverview", "OrderManagement");
             }
             
-            return RedirectToAction("Index", "OrderManagement");
+            return RedirectToAction("OrderOverview", "OrderManagement");
         }
 
         [HttpPost]

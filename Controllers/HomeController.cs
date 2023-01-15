@@ -1,4 +1,5 @@
 ﻿using BetterFurniture.Models;
+using BetterFurniture.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,15 +13,18 @@ namespace BetterFurniture.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly FurnitureRepository _repository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, FurnitureRepository repository)
         {
             _logger = logger;
+            _repository = repository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            List<Furniture> furnitures = _repository.GetAll();
+            return View(furnitures);
         }
 
         public IActionResult Privacy()

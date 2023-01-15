@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BetterFurniture.Controllers
 {
-    [Authorize(Roles ="Admin")]
+/*    [Authorize(Roles ="Admin")]*/
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
@@ -28,7 +28,7 @@ namespace BetterFurniture.Controllers
             _repository = repository;
         }
 
-        public IActionResult Index()
+        public IActionResult InventoryOverview()
         {
             var furniture = _repository.GetAll();
             return View(furniture);
@@ -69,7 +69,7 @@ namespace BetterFurniture.Controllers
             if (ModelState.IsValid)
             {
                 _repository.Add(furniture);
-                return RedirectToAction("Index", "InventoryManagement");
+                return RedirectToAction("InventoryOverview", "InventoryManagement");
             }
             string msg = "Lack of information. Please fill in all information needed";
             return RedirectToAction("CreateView", "InventoryManagement", new { Msg = msg });
@@ -109,7 +109,7 @@ namespace BetterFurniture.Controllers
             if (ModelState.IsValid)
             {
                 _repository.Update(furniture);
-                return RedirectToAction("Index","InventoryManagement");
+                return RedirectToAction("InventoryOverview", "InventoryManagement");
             }
             TempData["msg"] = "Please fill in all the information";
             Console.WriteLine("TempData[msg] = " + TempData["msg"]);
@@ -129,7 +129,7 @@ namespace BetterFurniture.Controllers
             }
             
             _repository.Delete(id);
-            return RedirectToAction("Index", "InventoryManagement");
+            return RedirectToAction("InventoryOverview", "InventoryManagement");
         }
 
         // delete image url

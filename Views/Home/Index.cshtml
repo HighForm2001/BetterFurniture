@@ -1,8 +1,32 @@
-﻿@{
+﻿@model List<Furniture>;
+@using Newtonsoft.Json;
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4">
+            <div class="card">
+                <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
+
+                    </h5>
+                    <p class="card-text">@item.Description</p>
+                    <p class="card-text">@item.Price</p>
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                        <input type="hidden" name="furnitureId" value="@item.ID" />
+                        <input type="submit" class="btn btn-primary" value="Add to Cart" asp-controller="Cart" asp-action="AddToCart" asp-route-itemName="@item.Name"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
 </div>
