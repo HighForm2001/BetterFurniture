@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace BetterFurniture.Controllers
 {
 /*    [Authorize(Roles ="Admin")]*/
+
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
@@ -33,6 +34,7 @@ namespace BetterFurniture.Controllers
             var furniture = _repository.GetAll();
             return View(furniture);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateView(string? msg)
         {
             if (msg != null)
@@ -41,6 +43,7 @@ namespace BetterFurniture.Controllers
             }
             return View();
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditView(int id)
         {
             ViewBag.Msg = "";
@@ -117,6 +120,7 @@ namespace BetterFurniture.Controllers
         }
 
         // delete product
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var furniture =await _repository.GetByID(id);
@@ -134,6 +138,7 @@ namespace BetterFurniture.Controllers
 
         // delete image url
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSingleImage(string imgUrl, int id)
         {
             // Delete the path from the ImageUrls property
@@ -161,6 +166,7 @@ namespace BetterFurniture.Controllers
         // update image
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<string> update_images(List<IFormFile> imageFile, string furniture_name, string furnitureUrl)
         {
             string url = "";
