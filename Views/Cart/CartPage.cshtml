@@ -8,47 +8,56 @@
 @if (ViewBag.Msg != null)
 {
     <center>
-        <h1>@ViewBag.Msg</h1>
+        <h1 style="color:@ViewBag.color">@ViewBag.Msg</h1>
         <a asp-action="Index" asp-controller="Home">See product page!</a>
     </center>
 
 }
 else
 {
-    <center>
-        <h1>CartPage for @Model.Cart.CustomerName:</h1>
-        <hr />
-        <br />
-        <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
-        <table>
+<center>
+    <h1>CartPage for @Model.Cart.CustomerName:</h1>
+    <hr />
+    <br />
+    <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
+    <table>
+        <tr>
+            <th>Item Name</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model.Cart.ItemName)
+        {
+            var furniture = Model.Furniture.FirstOrDefault(f => f.Name.Equals(item));
             <tr>
-                <th>Item Name</th>
-                <th>Price</th>
-                <th></th>
+                <td><a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(furniture)">@item</a></td>
+                <td>@furniture.Price</td>
+                <td>
+                    <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
+                        <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-cart_passed="@JsonConvert.SerializeObject(Model.Cart)">Remove</button>
+                    </form>
+                </td>
             </tr>
-            @foreach (var item in Model.Cart.ItemName)
-            {
-                var furniture = Model.Furniture.FirstOrDefault(f => f.Name.Equals(item));
-                <tr>
-                    <td>@item</td>
-                    <td>@furniture.Price</td>
-                    <td>
-                        <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
-                            <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-cart_passed="@JsonConvert.SerializeObject(Model.Cart)">Remove</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-            <tr>
-                <th>Total Price</th>
-                <td>@Model.Cart.total_price</td>
-            </tr>
-        </table>
-        <form asp-action="ProceedPayment" asp-controller="Payment">
-            <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
-        </form>
+        }
+        <tr>
+            <th>Total Price</th>
+            <td>@Model.Cart.total_price</td>
+        </tr>
+    </table>
+    @if (ViewBag.PaymentError != null)
+    {
+        @foreach (var words in ViewBag.PaymentError)
+        {
+            <span style="color:red">@words</span>
+        }
+    }
 
-    </center>
+
+    <form asp-action="ProceedPayment" asp-controller="Payment">
+        <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
+    </form>
+
+</center>
 }
 
 

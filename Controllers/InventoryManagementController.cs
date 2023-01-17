@@ -28,10 +28,36 @@ namespace BetterFurniture.Controllers
             _repository = repository;
         }
 
-        public IActionResult InventoryOverview()
+        public IActionResult Search(string query)
         {
-            var furniture = _repository.GetAll();
-            return View(furniture);
+            if (query == null)
+            {
+                var results = _repository.GetAll();
+                return View("InventoryOverview", results);
+            }
+            else
+            {
+                var results = _repository.GetAll().Where(f => f.Name.ToLower().Contains(query.ToLower())).ToList();
+
+                if (results.Count == 0)
+                {
+                    TempData["msg"] = "No result found for this term: " + query;
+                    TempData.Keep("msg");
+                    Console.WriteLine("results == null");
+                }
+                return View("InventoryOverview", results);
+            }
+
+        }
+
+        public IActionResult InventoryOverview(List<Furniture>? searched_furniture)
+        {
+            if (searched_furniture.Count() != 0)
+            {
+                return View(searched_furniture);
+            }
+            List<Furniture> furnitures = _repository.GetAll();
+            return View(furnitures);
         }
         public IActionResult CreateView(string? msg)
         {
@@ -214,7 +240,7 @@ namespace BetterFurniture.Controllers
                 url = url[0..^1];
             return url;
         }
-        // step 1: get string for connection to AWS account
+
         private List<string> getValues()
         {
             List<string> values = new List<string>();
@@ -231,6 +257,7 @@ namespace BetterFurniture.Controllers
             return values;
         }
 
+        // s3
         private AmazonS3Client connect()
         {
             List<string> values = getValues();
@@ -238,8 +265,6 @@ namespace BetterFurniture.Controllers
             return s3Client;
         }
 
-        
-        
         public async Task<string> DeleteImage(string imgUrl, string name)
         {
             // add credential

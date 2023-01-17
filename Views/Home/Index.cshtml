@@ -6,27 +6,78 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
+    <div id="update_succesful_id" style="color:lawngreen">@TempData["update"]</div>
 </div>
 
-<div class="row">
-    @foreach (var item in Model)
-    {
-        <div class="col-md-4">
-            <div class="card">
-                <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
+<form method="get" action="@Url.Action("Search", "Home")">
+    <input type="text" name="query" placeholder="Search for furniture">
+    <input type="submit" value="Search">
+</form>
 
-                    </h5>
-                    <p class="card-text">@item.Description</p>
-                    <p class="card-text">@item.Price</p>
-                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                        <input type="hidden" name="furnitureId" value="@item.ID" />
-                        <input type="submit" class="btn btn-primary" value="Add to Cart" asp-controller="Cart" asp-action="AddToCart" asp-route-itemName="@item.Name"/>
-                    </form>
+@if (Model.Count > 0)
+{
+    <div id="update_succesful_id"></div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
+
+                        </h5>
+                        <p class="card-text">@item.Description</p>
+                        <p class="card-text">@item.Price</p>
+                        @if (item.Quantity > 0)
+                        {
+                            <button id="add-to-cart" data-itemName="@item.Name">Add to Cart!</button>
+                            <!--<form id="add-to-cart-form" method="post">
+                                <input type="hidden" name="itemName" value="@item.Name" />
+                                <input type="submit" class="btn btn-primary" value="Add to Cart" />--> @*asp-controller="Cart" asp-action="AddToCart" asp-route-itemName="@item.Name" />*@
+                            <!--</form>-->
+                        }
+                        else
+                        {
+                            <button disabled class="out-of-stock-button">Out of Stock!</button>
+                        }
+
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
+else
+{
+    <span style="color:red">@TempData["msg"]</span>
+}
+
+<script >
+    console.log("Javascript is running!")
+    $(document).ready(function() {
+        $("#add-to-cart").on('click',function() {
+            event.preventDefault(); // prevent the form from submitting normally
+
+            // get the form data
+            var id = $(this).data('itemName');
+
+            // make the AJAX call
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AddToCart", "Cart")",
+                data: {itemName:itemName},
+                success: function(response) {
+                    if (response.success) {
+                        alert('Furniture has been added to cart!');
+                    }
+                    else {
+                        alert('Failed to add furniture to cart.');
+                    }
+                }
+            });
+        });
+    });
+</script>
+

@@ -21,8 +21,12 @@ namespace BetterFurniture.Controllers
             _repository = repository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(List<Furniture>? searched_furniture)
         {
+            if (searched_furniture.Count() != 0)
+            {
+                return View(searched_furniture);
+            }
             List<Furniture> furnitures = _repository.GetAll();
             return View(furnitures);
         }
@@ -36,6 +40,27 @@ namespace BetterFurniture.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        public IActionResult Search(string query)
+        {
+            if (query == null)
+            {
+                var results = _repository.GetAll();
+                return View("Index",results);
+            }
+            else
+            {
+                var results = _repository.GetAll().Where(f => f.Name.ToLower().Contains(query.ToLower())).ToList();
+                
+                if (results.Count == 0) {
+                    TempData["msg"] = "No result found for this term: " + query;
+                    TempData.Keep("msg");
+                    Console.WriteLine("results == null");
+                }
+                return View("Index", results);
+            }
+            
         }
     }
 }
