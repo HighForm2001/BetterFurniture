@@ -35,7 +35,8 @@ namespace BetterFurniture.Controllers
         public IActionResult ProceedPayment(string cart)
         {
             Cart cart_to_proceed = JsonConvert.DeserializeObject<Cart>(cart);
-            Console.WriteLine(cart_to_proceed.CustomerName);
+            bool isExceeded = false;
+            string paymentError = "The following furniture is out of stock: |";
             List<Furniture> all_furnitures = _repository.GetAll();
             List<Furniture> selected_furnitures = new List<Furniture>();
             ViewBag.total_price = cart_to_proceed.total_price;
@@ -44,6 +45,25 @@ namespace BetterFurniture.Controllers
             {
                 selected_furnitures.Add(all_furnitures.Find(x => x.Name.Equals(item_name)));
             }
+            var furnitureCount = selected_furnitures.GroupBy(f => f.Name)
+                                .Select(g => new { FurnitureName = g.Key, Quantity = g.Count() })
+                                .ToList();
+            foreach (var furniture_item in furnitureCount)
+            {
+                var furniture = _repository.GetByName(furniture_item.FurnitureName);
+                int originalQuantity = furniture.Quantity;
+                furniture.Quantity -= furniture_item.Quantity;
+                if (furniture.Quantity < 0)
+                {
+                    isExceeded = true;
+                    paymentError += furniture.Name + "|Required: " + furniture_item.Quantity + "|Stock(s) left: " + originalQuantity + "|";
+                }
+            }
+            if (isExceeded)
+            {
+                TempData["no_stock"] = paymentError;
+                return RedirectToAction("CartPage", "Cart");
+            }
             return View(selected_furnitures);
         }
         
@@ -51,9 +71,45 @@ namespace BetterFurniture.Controllers
         {
             List<Furniture> paid_furnitures = JsonConvert.DeserializeObject<List<Furniture>>(furnitures);
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
-            ViewBag.Msg = await createOrder(paid_furnitures, user, decimal.Parse(total));
-            return View();
+            string order_id = await createOrder(paid_furnitures, user, decimal.Parse(total));
+            Order order = await getOrder(order_id);
+            return View(order);
         }
+
+        public async Task<Order> getOrder(string orderID)
+        {
+            var client = connect();
+            List<Order> Orders = new List<Order>();
+            try
+            {
+                ScanRequest request = new ScanRequest
+                {
+                    TableName = orderTable
+                };
+
+                ScanResponse response = await client.ScanAsync(request);
+
+                foreach (var item in response.Items)
+                {
+                    Order order = new Order();
+                    order.OrderID = item["OrderID"].S;
+                    order.CustomerEmail = item["CustomerEmail"].S;
+                    order.CustomerName = item["CustomerName"].S;
+                    order.CustomerPhone = item["CustomerPhone"].S;
+                    order.ItemName = item["ItemName"].L.Select(av => av.S).ToList();
+                    order.ShippingAddress = item["ShippingAddress"].S;
+                    order.Status = item["Status"].S;
+                    order.TotalPrice = decimal.Parse(item["TotalPrice"].N);
+                    Orders.Add(order);
+                }
+            }
+            catch (AmazonDynamoDBException ex)
+            {
+                return null;
+            }
+            return Orders.Find(x=>x.OrderID.Equals(orderID));
+        }
+
         public async Task<string> createOrder(List<Furniture> furnitures, BetterFurnitureUser user, decimal totalPrice)
         {
             var client = connect();
@@ -101,14 +157,13 @@ namespace BetterFurniture.Controllers
                     furniture.Quantity -= furniture_item.Quantity;
                     _repository.Update(furniture);
                 }
-
-                       
+  
             }
             catch (AmazonDynamoDBException ex)
             {
                 return "Error: " + ex.Message;
             }
-            return "Created Succesfully";
+            return uniqueId;
         }
 
         // DynamoDBClient

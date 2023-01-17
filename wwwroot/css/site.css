@@ -75,4 +75,39 @@ body {
 .furniture-image {
     max-width: 500px; /* or any desired width */
     max-height: 500px; /* or any desired height */
+
+}
+
+.carousel {
+    position: relative;
+    width: 500px; /* or any desired width */
+    height: 500px; /* or any desired height */
+}
+
+.carousel-control-prev, .carousel-control-next {
+    position: absolute;
+    width: auto;
+    top:50%;
+    padding-top: 0;
+    margin-top: -22px;
+    color:darkred;
+    font-size: 36px;
+    background-color:black;
+    max-block-size:50px;
+}
+
+.carousel-control-prev {
+    left: auto;
+}
+
+.carousel-control-next {
+    right: 0;
+}
+.carousel-inner{ /* or any desired width */
+    margin: auto;
+    position:center;
+}
+
+.out-of-stock-button{
+    color:red;
 }

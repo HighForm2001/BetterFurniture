@@ -94,6 +94,17 @@ namespace BetterFurniture.Controllers
                     ViewBag.color = "red";
                 ViewBag.modifyMsg = modifyMsg;
             }
+            if (TempData["no_stock"] != null)
+            {
+                var to_pass = (string)TempData["no_stock"];
+                Console.WriteLine(to_pass);
+                var  list_to_pass = to_pass.Split("|");
+                foreach(var word in list_to_pass)
+                {
+                    Console.WriteLine(word);
+                }
+                ViewBag.PaymentError = list_to_pass;
+            }
             var cart_view = new CartViewModel
             {
                 Cart = cart,
@@ -160,13 +171,9 @@ namespace BetterFurniture.Controllers
             return cart;
         }
 
+        [HttpPost]
         public async Task<IActionResult> AddToCart(string itemName)
         {
-            return RedirectToAction("Index", "Home");
-        }
-        public async Task<IActionResult> AddToCartFromDetail(string itemName)
-        {
-            Console.WriteLine("Item name at line 169: " + itemName);
             List<Cart> carts = await getCarts();
             var user = await _userManager.GetUserAsync(HttpContext.User);
             string customerName = user.CustomerFullName;
@@ -184,7 +191,8 @@ namespace BetterFurniture.Controllers
             cart.ItemName.Add(itemName);
             cart = update_cart_total_price(cart);
             string msg = await update_cart(cart);
-            return RedirectToAction("Index", "Home");
+            Console.WriteLine("msg = " + msg);
+            return Json(new { message = msg }) ;
         }
 
         public async Task<string> Delete(Cart cart)

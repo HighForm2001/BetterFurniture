@@ -2,41 +2,56 @@
 @{
     ViewData["Title"] = "InventoryOverview";
 }
-@ViewBag 
+@ViewBag
 <h1>Inventory Management Page</h1>
 
-<center>
-   <table>
-       <thead>
-           <tr>
-               <th>ID</th>
-               <th>Name</th>
-               <th>Description</th>
-               <th>Price</th>
-               <th>Quantity</th>
-               <th>Urls</th>
-               <th>Actions</th>
-           </tr>
-       </thead>
-       <tbody>
-           @foreach(var furniture in Model)
-            {
+<form method="get" action="@Url.Action("Search", "InventoryManagement")">
+    <input type="text" name="query" placeholder="Search for furniture">
+    <input type="submit" value="Search">
+</form>
+
+@if (Model.Count > 0)
+{
+    <center>
+        <table>
+            <thead>
                 <tr>
-                    <td>@furniture.ID</td>
-                    <td>@furniture.Name</td>
-                    <td>@furniture.Description</td>
-                    <td>@furniture.Price</td>
-                    <td>@furniture.Quantity</td>
-                    <td>@foreach (var url in furniture.ImageUrls.Split(",")) {
-                        <img src="@url" width="200" height="200"/>
-                    }</td>
-                    <td>
-                        <a asp-action="EditView" asp-controller="InventoryManagement" asp-route-id ="@furniture.ID">Edit</a>
-                        <a asp-action="Delete" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Delete</a>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Urls</th>
+                    <th>Actions</th>
                 </tr>
-            }
-       </tbody>
-   </table>
-   <a asp-action="CreateView">Add New Furniture</a>
-</center>
+            </thead>
+            <tbody>
+                @foreach (var furniture in Model)
+                {
+                    <tr>
+                        <td>@furniture.ID</td>
+                        <td>@furniture.Name</td>
+                        <td>@furniture.Description</td>
+                        <td>@furniture.Price</td>
+                        <td>@furniture.Quantity</td>
+                        <td>
+                            @foreach (var url in furniture.ImageUrls.Split(","))
+                            {
+                                <img src="@url" width="200" height="200" />
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="EditView" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Edit</a>
+                            <a asp-action="Delete" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a asp-action="CreateView">Add New Furniture</a>
+    </center>
+}
+else
+{
+    <span style="color:red">@TempData["msg"]</span>
+}
