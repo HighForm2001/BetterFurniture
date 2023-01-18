@@ -32,11 +32,7 @@
                         <p class="card-text">@item.Price</p>
                         @if (item.Quantity > 0)
                         {
-                            <button id="add-to-cart" data-itemName="@item.Name">Add to Cart!</button>
-                            <!--<form id="add-to-cart-form" method="post">
-                                <input type="hidden" name="itemName" value="@item.Name" />
-                                <input type="submit" class="btn btn-primary" value="Add to Cart" />--> @*asp-controller="Cart" asp-action="AddToCart" asp-route-itemName="@item.Name" />*@
-                            <!--</form>-->
+                            <button class="btn btn-primary" id="addToCartBtn" data-itemId="@item.Name" onclick="addToCart()">Add to Cart</button>
                         }
                         else
                         {
@@ -54,30 +50,9 @@ else
     <span style="color:red">@TempData["msg"]</span>
 }
 
-<script >
-    console.log("Javascript is running!")
-    $(document).ready(function() {
-        $("#add-to-cart").on('click',function() {
-            event.preventDefault(); // prevent the form from submitting normally
+<h1 id="time"></h1>
 
-            // get the form data
-            var id = $(this).data('itemName');
-
-            // make the AJAX call
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("AddToCart", "Cart")",
-                data: {itemName:itemName},
-                success: function(response) {
-                    if (response.success) {
-                        alert('Furniture has been added to cart!');
-                    }
-                    else {
-                        alert('Failed to add furniture to cart.');
-                    }
-                }
-            });
-        });
-    });
+<script>
+    
 </script>
 

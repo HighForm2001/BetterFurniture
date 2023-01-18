@@ -172,7 +172,7 @@ namespace BetterFurniture.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToCart(string itemName)
+        public async Task<JsonResult> AddToCart(string itemName)
         {
             List<Cart> carts = await getCarts();
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -192,7 +192,7 @@ namespace BetterFurniture.Controllers
             cart = update_cart_total_price(cart);
             string msg = await update_cart(cart);
             Console.WriteLine("msg = " + msg);
-            return Json(new { message = msg }) ;
+            return Json(new { message = "Item " + itemName + " has been added to your cart!" });
         }
 
         public async Task<string> Delete(Cart cart)

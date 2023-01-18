@@ -6,7 +6,6 @@
 <h1>Edit Order</h1>
 
 <center>
-
     <h1 style="border:solid;font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
         Edit Order detail for Order ID: @Model.OrderID
     </h1>
@@ -66,8 +65,8 @@
             <tr>
                 <th>Status</th>
                 <td>
-      
                     <select asp-for="@Model.Status">
+                        <option value="Waiting to be packed">Waiting to be packed</option>
                         <option value="Packed">Packed</option>
                         <option value="In Transit">In Transit</option>
                         <option value="Delivered">Delivered</option>
@@ -81,6 +80,4 @@
         </table>
         <input type="submit" value="Edit Order ID: @Model.OrderID" />
     </form>
-
-    
 </center>

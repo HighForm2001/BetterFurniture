@@ -16,8 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BetterFurniture.Controllers
 {
-/*    [Authorize(Roles ="Admin")]*/
-
+    [Authorize(Roles = "Admin")]
     public class InventoryManagementController : Controller
     {
         private const string s3name = "better-furniture-s3";
@@ -60,7 +59,6 @@ namespace BetterFurniture.Controllers
             List<Furniture> furnitures = _repository.GetAll();
             return View(furnitures);
         }
-        [Authorize(Roles = "Admin")]
         public IActionResult CreateView(string? msg)
         {
             if (msg != null)

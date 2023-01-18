@@ -58,9 +58,7 @@
     <p>Price: $@Model.Price</p>
     @if (Model.Quantity > 0)
     {
-        <form asp-action="AddToCart" asp-controller="Cart" asp-route-furnitureName="@Model.Name">
-            <button type="submit" asp-action="AddToCartFromDetail" asp-controller="Cart" asp-route-itemName="@Model.Name" onclick="window.history.back()">Add to Cart!</button>
-        </form>
+        <button class="btn btn-primary" id="addToCartBtn" data-itemId="@Model.Name" onclick="addToCart()">Add to Cart</button>
     }
     else
     {

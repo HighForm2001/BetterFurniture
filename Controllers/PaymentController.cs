@@ -125,7 +125,7 @@ namespace BetterFurniture.Controllers
                     { "ShippingAddress",new AttributeValue{S=user.CustomerAddress } },
                     { "CustomerEmail",new AttributeValue{S=user.Email } }, // need to edit
                     { "CustomerPhone",new AttributeValue{S=user.PhoneNumber } }, // need to edit
-                    { "Status",new AttributeValue{S="Packed" } },
+                    { "Status",new AttributeValue{S="Waiting to be packed" } },
                     { "ItemName",new AttributeValue{L=furnitures.Select(x=>new AttributeValue{S=x.Name }).ToList() } },
                      {"TotalPrice",new AttributeValue{N=totalPrice.ToString()} }
                 };
