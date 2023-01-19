@@ -32,9 +32,12 @@ namespace BetterFurniture.Controllers
         // views
         public async Task<IActionResult> Index(List<Furniture>? searched_furniture)
         {
-            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
-            string msg = await checkSubscription(user);
-            Console.WriteLine(msg);
+            if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+                string msg = await checkSubscription(user);
+                Console.WriteLine(msg);
+            }
             if (searched_furniture.Count() != 0)
             {
                 return View(searched_furniture);
