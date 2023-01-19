@@ -4,9 +4,9 @@
 // Write your JavaScript code.
 
 
-function addToCart() {
+function addToCart(btn) {
     // Get the itemId from the button's data attribute
-    var itemId = document.getElementById("addToCartBtn").getAttribute("data-itemId");
+    var itemId =btn.getAttribute("data-itemId");
     // Make an AJAX call to the server to add the item to the cart
     $.ajax({
         type: "POST",

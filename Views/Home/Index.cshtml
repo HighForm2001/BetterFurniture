@@ -32,7 +32,7 @@
                         <p class="card-text">@item.Price</p>
                         @if (item.Quantity > 0)
                         {
-                            <button class="btn btn-primary" id="addToCartBtn" data-itemId="@item.Name" onclick="addToCart()">Add to Cart</button>
+                            <button class="btn btn-primary addToCartBtn" data-itemId="@item.Name" onclick="addToCart(this)">Add to Cart</button>
                         }
                         else
                         {
