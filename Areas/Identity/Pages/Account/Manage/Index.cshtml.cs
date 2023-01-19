@@ -59,7 +59,12 @@ namespace BetterFurniture.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                CustomerFullName = user.CustomerFullName,
+                CustomerAge = user.CustomerAge,
+                CustomerAddress = user.CustomerAddress,
+                CustomerDOB = user .CustomerDOB
+
             };
         }
 
@@ -99,7 +104,23 @@ namespace BetterFurniture.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
-
+            if (Input.CustomerFullName != user.CustomerFullName)
+            {
+                user.CustomerFullName = Input.CustomerFullName;
+            }
+            if (Input.CustomerAddress != user.CustomerAddress)
+            {
+                user.CustomerAddress = Input.CustomerAddress;
+            }
+            if (Input.CustomerAge != user.CustomerAge)
+            {
+                user.CustomerAge = Input.CustomerAge;
+            }
+            if (Input.CustomerDOB != user.CustomerDOB)
+            {
+                user.CustomerDOB = Input.CustomerDOB;
+            }
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();

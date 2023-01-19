@@ -73,6 +73,7 @@ namespace BetterFurniture.Controllers
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
             string order_id = await createOrder(paid_furnitures, user, decimal.Parse(total));
             Order order = await getOrder(order_id);
+            Console.WriteLine(order_id);
             return View(order);
         }
 
