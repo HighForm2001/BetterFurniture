@@ -16,14 +16,14 @@
 else
 {
 <center>
-    <h1>CartPage for @Model.Cart.CustomerName:</h1>
+    <h1 class="title cart">CartPage for @Model.Cart.CustomerName:</h1>
     <hr />
     <br />
     <span style="color:@ViewBag.color">@ViewBag.modifyMsg</span>
-    <table>
+    <table class="table-custom">
         <tr>
-            <th>Item Name</th>
-            <th>Price</th>
+            <th class="row-content">Item Name</th>
+            <th class="row-content">Price</th>
             <th></th>
         </tr>
         @foreach (var item in Model.Cart.ItemName)
@@ -31,8 +31,8 @@ else
             var furniture = Model.Furniture.FirstOrDefault(f => f.Name.Equals(item));
             <tr>
                 <td><a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(furniture)">@item</a></td>
-                <td>@furniture.Price</td>
-                <td>
+                <td class="row-content">@furniture.Price</td>
+                <td class="row-content">
                     <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
                         <button type="submit" class="btn btn-primary" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-cart_passed="@JsonConvert.SerializeObject(Model.Cart)">Remove</button>
                     </form>
@@ -40,8 +40,8 @@ else
             </tr>
         }
         <tr>
-            <th>Total Price</th>
-            <td>@Model.Cart.total_price</td>
+            <th class="row-content">Total Price</th>
+            <td class="row-content">@Model.Cart.total_price</td>
         </tr>
     </table>
     @if (ViewBag.PaymentError != null)
@@ -55,7 +55,7 @@ else
 
 
     <form asp-action="ProceedPayment" asp-controller="Payment">
-        <button type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
+        <button class="btn-submit" type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)" asp-action="ProceedPayment" asp-controller="Payment">Proceed Payment</button>
     </form>
 
 </center>

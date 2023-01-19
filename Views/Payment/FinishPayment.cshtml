@@ -3,47 +3,43 @@
     ViewData["Title"] = "FinishPayment";
 }
 
-<h1>FinishPayment</h1>
+<h1 class="title payment">FinishPayment</h1>
 
 <span style="color:red">@ViewBag.Msg</span>
 @if (Model != null)
 {
     <h1>Purchase Order Information: </h1>
-    <table border="1">
+    <table border="1" class="table-custom">
         <tr>
-            <th>Order ID</th>
-            <th>Customer Name</th>
-            <th>Shipping Address</th>
-            <th>Customer Email</th>
-            <th>Customer Phone</th>
-            <th>Status</th>
-            <th>Order Item(s)</th>
-            <th>Total Price</th>
+            <th class="row-content">Order ID</th>
+            <th class="row-content">Customer Name</th>
+            <th class="row-content">Shipping Address</th>
+            <th class="row-content">Customer Email</th>
+            <th class="row-content">Customer Phone</th>
+            <th class="row-content">Status</th>
+            <th class="row-content">Order Item(s)</th>
+            <th class="row-content">Total Price</th>
         </tr>
         <tr>
-            <td>
-                @Model.OrderID
-            </td>
-            <td>@Model.CustomerName</td>
-            <td>@Model.ShippingAddress</td>
-            <td>@Model.CustomerEmail</td>
-            <td>@Model.CustomerPhone</td>
-            <td>@Model.Status</td>
+            <td class="row-content">@Model.OrderID</td>
+            <td class="row-content">@Model.CustomerName</td>
+            <td class="row-content">@Model.ShippingAddress</td>
+            <td class="row-content">@Model.CustomerEmail</td>
+            <td class="row-content">@Model.CustomerPhone</td>
+            <td class="row-content">@Model.Status</td>
             <td>
                 <ul>
                     @foreach (var order_item in Model.ItemName)
                     {
-                        <li>@order_item</li>
+                        <li class="row-content">@order_item</li>
                     }
                 </ul>
             </td>
-            <td>@Model.TotalPrice</td>
+            <td class="row-content">@Model.TotalPrice</td>
         </tr>
         }
     </table>
-    <h1 class="notification">Please check your mail box to look for a confirmation email sent by OrderNoti.</h1>
-    <h1 class="notification">Ignore this one if you already purchased any furniture from our website before.</h1>
-    <a asp-action="Index" asp-controller="Home" class="text-center">Buy More!</a>
+    <a class="link-submit" asp-action="Index" asp-controller="Home" class="text-center">Buy More!</a>
 }
 else
 {

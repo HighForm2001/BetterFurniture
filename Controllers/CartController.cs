@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BetterFurniture.Controllers
 {
-    [Authorize]
+    /*[Authorize]*/
     public class CartController : Controller
     {
         private const string tableName = "BetterFurnitureCart";
@@ -30,48 +30,8 @@ namespace BetterFurniture.Controllers
             _userManager = userManager;
         }
 
-        private AmazonDynamoDBClient connect()
-        {
-            List<string> keys = new List<string>();
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-            IConfiguration config = builder.Build();
-
-            keys.Add(config["AWS:id"]);
-            keys.Add(config["AWS:key"]);
-            keys.Add(config["AWS:token"]);
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
-            return client;
-        }
-
-        public async Task<List<Cart>> getCarts()
-        {
-            var client = connect();
-            List<Cart> carts = new List<Cart>();
-            try
-            {
-                ScanRequest request = new ScanRequest
-                {
-                    TableName = tableName
-                };
-
-                ScanResponse response = await client.ScanAsync(request);
-
-                foreach (var item in response.Items)
-                {
-                    Cart cart = new Cart();
-                    cart.CustomerName = item["CustomerName"].S;
-                    cart.ItemName = item["ItemName"].L.Select(av => av.S).ToList();
-                    cart.total_price = decimal.Parse(item["TotalPrice"].N);
-                    carts.Add(cart);
-                }
-            }
-            catch (AmazonDynamoDBException ex)
-            {
-                return null;
-            }
-            return carts;
-        }
-
+        //view
+        [Authorize]
         public async Task<IActionResult> CartPage()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -112,6 +72,7 @@ namespace BetterFurniture.Controllers
             };
             return View(cart_view);
         }
+
         public async Task<IActionResult> RemoveFromCart(string itemName, string cart_passed)
         {
             Cart cart = JsonConvert.DeserializeObject<Cart>(cart_passed);
@@ -141,6 +102,7 @@ namespace BetterFurniture.Controllers
             {
                 Dictionary<string, AttributeValue> item = new Dictionary<string, AttributeValue>
                 {
+                    {"CustomerId",new AttributeValue{S=cart.CustomerId } },
                     {"CustomerName",new AttributeValue{S=cart.CustomerName } },
                     { "TotalPrice",new AttributeValue{N=cart.total_price.ToString() } },
                     { "ItemName",new AttributeValue{L=cart.ItemName.Select(x=>new AttributeValue{S=x }).ToList() } }
@@ -174,36 +136,42 @@ namespace BetterFurniture.Controllers
         [HttpPost]
         public async Task<JsonResult> AddToCart(string itemName)
         {
-            List<Cart> carts = await getCarts();
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            string customerName = user.CustomerFullName;
-            Cart cart = carts.Find(x => x.CustomerName.Equals(customerName));
-            if (cart == null)
+            if (User.Identity.IsAuthenticated)
             {
-                cart = new Cart
+                List<Cart> carts = await getCarts();
+                Console.WriteLine("is cart null? : " + carts);
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                string customerId = user.Id;
+                Cart cart = carts.Find(x => x.CustomerId.Equals(customerId));
+                if (cart == null)
                 {
-                    CustomerName = customerName,
-                    ItemName = new List<string>(),
-                    total_price = 0
-                };
-                // create a new cart for this customer
+                    cart = new Cart
+                    {
+                        CustomerId = customerId,
+                        CustomerName = user.CustomerFullName,
+                        ItemName = new List<string>(),
+                        total_price = 0
+                    };
+                    // create a new cart for this customer
+                }
+                cart.ItemName.Add(itemName);
+                cart = update_cart_total_price(cart);
+                string msg = await update_cart(cart);
+                Console.WriteLine("msg = " + msg);
+                return Json(new { message = "Item " + itemName + " has been added to your cart!" ,isAuthenticated=true});
             }
-            cart.ItemName.Add(itemName);
-            cart = update_cart_total_price(cart);
-            string msg = await update_cart(cart);
-            Console.WriteLine("msg = " + msg);
-            return Json(new { message = "Item " + itemName + " has been added to your cart!" });
+            return Json(new { message = "Add to cart failed.", isAuthenticated = false });
         }
 
         public async Task<string> Delete(Cart cart)
         {
             var client = connect();
-            string id = cart.CustomerName;
+            string id = cart.CustomerId;
             try
             {
                 Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
                     {
-                        {"CustomerName",new AttributeValue{S=id } }
+                        {"CustomerId",new AttributeValue{S=id } }
                     };
                 DeleteItemRequest request = new DeleteItemRequest
                     {
@@ -223,5 +191,52 @@ namespace BetterFurniture.Controllers
 
             return "Deleted Successfully";
         }
+
+        private AmazonDynamoDBClient connect()
+        {
+            List<string> keys = new List<string>();
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+            IConfiguration config = builder.Build();
+
+            keys.Add(config["AWS:id"]);
+            keys.Add(config["AWS:key"]);
+            keys.Add(config["AWS:token"]);
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        public async Task<List<Cart>> getCarts()
+        {
+            var client = connect();
+            List<Cart> carts = new List<Cart>();
+            try
+            {
+                ScanRequest request = new ScanRequest
+                {
+                    TableName = tableName
+                };
+
+                ScanResponse response = await client.ScanAsync(request);
+
+                foreach (var item in response.Items)
+                {
+                    Cart cart = new Cart
+                    {
+                        CustomerId = item["CustomerId"].S,
+                        CustomerName = item["CustomerName"].S,
+                        ItemName = item["ItemName"].L.Select(av => av.S).ToList(),
+                        total_price = decimal.Parse(item["TotalPrice"].N)
+                    };
+                    carts.Add(cart);
+                }
+            }
+            catch (AmazonDynamoDBException ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+            return carts;
+        }
     }
+
 }

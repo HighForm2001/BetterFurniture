@@ -3,81 +3,88 @@
     ViewData["Title"] = "EditOrder";
 }
 
-<h1>Edit Order</h1>
+<h1 class="title order">Edit Order</h1>
+@if (Model != null)
+{
+    <center>
+        <h1 class="title order">
+            Order ID: @Model.OrderID
+        </h1>
+        <span style="color:red">@ViewBag.Msg</span>
+        <form asp-action="processEditOrder" asp-controller="OrderManagement" method="post" enctype="multipart/form-data">
+            <table border="1" class="table-custom">
+                <tr>
+                    <th class="row-content">Order ID</th>
+                    <td>
+                        <input class="row-content" asp-for="@Model.OrderID" readonly />
+                        <span class="row-content" asp-validation-for="@Model.OrderID" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Customer Name</th>
+                    <td>
+                        <input class="row-content" asp-for="@Model.CustomerName" />
+                        <span class="row-content" asp-validation-for="@Model.CustomerName" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Shipping Address</th>
+                    <td>
+                        <textarea class="row-content text-box" asp-for="@Model.ShippingAddress"></textarea>
+                        <span class="row-content" asp-validation-for="@Model.ShippingAddress" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Customer Email</th>
+                    <td>
+                        <input class="row-content" asp-for="@Model.CustomerEmail" />
+                        <span class="row-content" asp-validation-for="@Model.CustomerEmail" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Customer Phone</th>
+                    <td>
+                        <input class="row-content" asp-for="@Model.CustomerPhone" type="number" min="1" step="1" />
+                        <span class="row-content" asp-validation-for="@Model.CustomerPhone" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Ordered Items</th>
+                    <td>
+                        <ul>
+                            @foreach (var item in Model.ItemName)
+                            {
+                                <li class="row-content">@item</li>
+                            }
+                        </ul>
+                        <select asp-items="@Model.ItemNameList" asp-for="@Model.ItemName" multiple readonly asp-selected="@Model.ItemNameList" style="display:none">
+                        </select>
 
-<center>
-    <h1 style="border:solid;font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
-        Edit Order detail for Order ID: @Model.OrderID
-    </h1>
-    <span style="color:red">@ViewBag.Msg</span>
-    <form asp-action="processEditOrder" asp-controller="OrderManagement" method="post" enctype="multipart/form-data">
-        <table border="1">
-            <tr>
-                <th>Order ID</th>
-                <td>
-                    <input asp-for="@Model.OrderID" readonly />
-                    <span asp-validation-for="@Model.OrderID" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <th>Customer Name</th>
-                <td>
-                    <input asp-for="@Model.CustomerName" />
-                    <span asp-validation-for="@Model.CustomerName" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <th>Shipping Address</th>
-                <td>
-                    <textarea asp-for="@Model.ShippingAddress"></textarea>
-                    <span asp-validation-for="@Model.ShippingAddress" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <th>Customer Email</th>
-                <td>
-                    <input asp-for="@Model.CustomerEmail"/>
-                    <span asp-validation-for="@Model.CustomerEmail" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <th>Customer Phone</th>
-                <td>
-                    <input asp-for="@Model.CustomerPhone" type="number" min="1" step="1" />
-                    <span asp-validation-for="@Model.CustomerPhone" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <th>Ordered Items</th>
-                <td>
-                    <ul>
-                        @foreach (var item in Model.ItemName)
-                        {
-                            <li>@item</li>
-                        }
-                    </ul>
-                    <select asp-items="@Model.ItemNameList" asp-for="@Model.ItemName" multiple readonly asp-selected="@Model.ItemNameList" style="display:none">
-                    </select>
+                    </td>
 
-                </td>
+                </tr>
+                <tr>
+                    <th class="row-content">Status</th>
+                    <td>
+                        <select class="row-content" asp-for="@Model.Status">
+                            <option class="row-content" value="Waiting to be packed">Waiting to be packed</option>
+                            <option class="row-content" value="Packed">Packed</option>
+                            <option class="row-content" value="In Transit">In Transit</option>
+                            <option class="row-content" value="Delivered">Delivered</option>
+                            <option class="row-content" value="Out for Delivery">Out for Delivery</option>
+                            <option class="row-content" value="Returned">Returned</option>
+                            <option class="row-content" value="Cancelled">Cancelled</option>
+                        </select>
+                        <span asp-validation-for="@Model.Status" class="text-danger"></span>
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Edit Order ID: @Model.OrderID" />
+        </form>
+    </center>
+            }
+            else
+            {
+                <h1 class="notification">No Order found.</h1>
+            }
 
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>
-                    <select asp-for="@Model.Status">
-                        <option value="Waiting to be packed">Waiting to be packed</option>
-                        <option value="Packed">Packed</option>
-                        <option value="In Transit">In Transit</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Out for Delivery">Out for Delivery</option>
-                        <option value="Returned">Returned</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                    <span asp-validation-for="@Model.Status" class="text-danger"></span>
-                </td>
-            </tr>
-        </table>
-        <input type="submit" value="Edit Order ID: @Model.OrderID" />
-    </form>
-</center>

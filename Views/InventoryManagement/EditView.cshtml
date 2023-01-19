@@ -5,45 +5,45 @@
 }
 <center>
 
-    <h1 style="border:solid;font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+    <h1 class="title inventory">
         Edit Furniture Information for @Model.Name
     </h1>
     <span style="color:red">@ViewBag.Msg</span>
     <form asp-action="Edit" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
-        <table border="1">
+        <table border="1" class="table-custom">
             <tr>
-                <th>Furniture ID</th>
+                <th class="row-content">Furniture ID</th>
                 <td>
-                    <input asp-for="@Model.ID" readonly />
-                    <span asp-validation-for="@Model.ID" class="text-danger"></span>
+                    <input class="row-content" asp-for="@Model.ID" readonly />
+                    <span class="row-content" asp-validation-for="@Model.ID" class="text-danger"></span>
                 </td>
             </tr>
             <tr>
-                <th>Furniture Name</th>
+                <th class="row-content">Furniture Name</th>
                 <td>
-                    <input asp-for="@Model.Name" />
-                    <span asp-validation-for="@Model.Name" class="text-danger"></span>
+                    <input class="row-content" asp-for="@Model.Name" />
+                    <span class="row-content" asp-validation-for="@Model.Name" class="text-danger"></span>
                 </td>
             </tr>
             <tr>
-                <th>Description</th>
+                <th class="row-content">Description</th>
                 <td>
-                    <textarea asp-for="@Model.Description"></textarea>
-                    <span asp-validation-for="@Model.Description" class="text-danger"></span>
+                    <textarea class="row-content text-box" asp-for="@Model.Description"></textarea>
+                    <span class="row-content" asp-validation-for="@Model.Description" class="text-danger"></span>
                 </td>
             </tr>
             <tr>
-                <th>Price</th>
+                <th class="row-content">Price</th>
                 <td>
-                    <input asp-for="@Model.Price" type="number" min="0" step=".01" />
-                    <span asp-validation-for="@Model.Price" class="text-danger"></span>
+                    <input class="row-content" asp-for="@Model.Price" type="number" min="0" step=".01" />
+                    <span class="row-content" asp-validation-for="@Model.Price" class="text-danger"></span>
                 </td>
             </tr>
             <tr>
-                <th>Quantity</th>
+                <th class="row-content">Quantity</th>
                 <td>
-                    <input asp-for="@Model.Quantity" type="number" min="1" step="1" />
-                    <span asp-validation-for="@Model.Quantity" class="text-danger"></span>
+                    <input class="row-content" asp-for="@Model.Quantity" type="number" min="1" step="1" />
+                    <span class="row-content" asp-validation-for="@Model.Quantity" class="text-danger"></span>
                 </td>
             </tr>
             <tr>
@@ -54,9 +54,9 @@
                 </td>
             </tr>
             <tr>
-                <th>Insert Pictures</th>
+                <th class="row-content">Insert Pictures</th>
                 <td>
-                    <input type="file" name="imageFile" accept="image/*" multiple />
+                    <input class="btn-submit" type="file" name="imageFile" accept="image/*" multiple />
                 </td>
             </tr>
         </table>
@@ -66,19 +66,19 @@
     <form asp-action="DeleteSingleImage" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
         <table border="1">
             <tr>
-                <th>Furniture Images</th>
+                <th class="row-content">Furniture Images</th>
                 <td>
                     @if (Model.ImageUrls.Length > 0)
                     {
                         foreach (var url in Model.ImageUrls.Split(","))
                         {
                             <img src="@url" width="200" height="200" />
-                            <button type="submit" class="btn btn-primary" asp-action="DeleteSingleImage" asp-route-imgUrl="@url" asp-route-id="@Model.ID">Delete</button>
+                            <button type="submit" class="btn-submit" asp-action="DeleteSingleImage" asp-route-imgUrl="@url" asp-route-id="@Model.ID">Delete</button>
                         }
                     }
                     else
                     {
-                        <span>No Image available for this product</span>
+                        <span class="row-content">No Image available for this product</span>
                     }
 
                 </td>

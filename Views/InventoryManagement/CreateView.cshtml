@@ -6,47 +6,47 @@
 
 
 <center>
-    <h1 style="border:solid;font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+    <h1 class="title inventory">
         Create Furniture
     </h1>
     <span style="color:crimson">@ViewBag.Msg</span>
     <form asp-action="Create" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
-        <table border="1">
-            <tr>
-                <th>Furniture Name</th>
+        <table border="1" class="table-custom">
+            <tr class="row-title">
+                <th class="row-content">Furniture Name</th>
                 <td>
-                    <input asp-for="Name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <input class="row-content" asp-for="Name" />
+                    <span class="row-content" asp-validation-for="Name" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
-                <th>Description</th>
+            <tr class="row-title">
+                <th class="row-content">Description</th>
                 <td>
-                    <textarea asp-for="Description"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
+                    <textarea class="row-content text-box" asp-for="Description"></textarea>
+                    <span class="row-content" asp-validation-for="Description" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
-                <th>Price</th>
+            <tr class="row-title">
+                <th class="row-content">Price</th>
                 <td>
-                    <input asp-for="Price" type="number" min="0" step=".01" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
+                    <input class="row-content" asp-for="Price" type="number" min="0" step=".01" />
+                    <span class="row-content" asp-validation-for="Price" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
-                <th>Quantity</th>
+            <tr class="row-title">
+                <th class="row-content">Quantity</th>
                 <td>
-                    <input asp-for="Quantity" type="number" min="1" step="1" />
-                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                    <input class="row-content" asp-for="Quantity" type="number" min="1" step="1" />
+                    <span class="row-content" asp-validation-for="Quantity" class="text-danger"></span>
                 </td>
             </tr>
-            <tr>
-                <th>Furniture Images</th>
+            <tr class="row-title">
+                <th class="row-content">Furniture Images</th>
                 <td>
                     <input type="file" name="imageFile" accept="image/*" multiple />
                 </td>
             </tr>
         </table>
-        <input type="submit" value="Create Furniture" />
+        <input class="btn-submit" type="submit" value="Create Furniture" />
     </form>
 </center>

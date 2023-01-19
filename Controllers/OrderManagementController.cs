@@ -29,36 +29,16 @@ namespace BetterFurniture.Controllers
             _userManager = userManager;
         }
 
-        private AmazonDynamoDBClient connectDynamoDb()
-        {
-            List<string> keys = getKeys();
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2],RegionEndpoint.USEast1);
-            return client;
-        }
-
-        private AmazonSimpleNotificationServiceClient connectSNS()
-        {
-            List<string> keys = getKeys();
-            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
-            return client;
-        }
-
-        private List<string> getKeys()
-        {
-            List<string> keys = new List<string>();
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-            IConfiguration config = builder.Build();
-
-            keys.Add(config["AWS:id"]);
-            keys.Add(config["AWS:key"]);
-            keys.Add(config["AWS:token"]);
-            return keys;
-        }
-
+        
+        // views
         // order page
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> OrderOverview()
+        public async Task<IActionResult> OrderOverview(List<Order>? searched_orders)
         {
+            if (searched_orders.Count() != 0)
+            {
+                return View(searched_orders);
+            }
             if (TempData["msg"] != null)
             {
                 string msg = (string)TempData["msg"];
@@ -76,6 +56,69 @@ namespace BetterFurniture.Controllers
             return View(orders);
 
         }
+        
+
+        // edit page
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditOrder(string id)
+        {
+            List<Order> orders =await getOrders();
+            if (orders != null)
+            {
+                Order order = orders.Find(x => x.OrderID == id);
+                if (order != null)
+                    return View(order);
+            }
+            return View();
+        }
+
+
+        public async Task<IActionResult> OrderStatus()
+        {
+            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+            string userName = user.CustomerFullName;
+            List<Order> selected_orders = new List<Order>();
+            List<Order> all_orders = await getOrders();
+            foreach(var order in all_orders)
+            {
+                if (order.CustomerName.Equals(userName))
+                    selected_orders.Add(order);
+            }
+            return View(selected_orders);
+        }
+        
+        // functions
+        // edit order
+        public async Task<IActionResult> processEditOrder(Order order)
+        {
+            Console.WriteLine(order.ItemName);
+            string msg = await update_dynamodb(order);
+            TempData["msg"] = msg;
+            return RedirectToAction("OrderOverview", "OrderManagement");
+        }
+
+        public async Task<IActionResult> Search(string query)
+        {
+            if (query == null)
+            {
+                var results = await getOrders();
+                return View("OrderOverview", results);
+            }
+            else
+            {
+                var lists = await getOrders();
+                var results = lists.Where(x => x.CustomerName.ToLower().Contains(query.ToLower())).ToList();
+                if (results.Count == 0)
+                {
+                    TempData["search"] = "No result found for this Customer Name: " + query;
+                    TempData.Keep("search");
+                    Console.WriteLine("results == null");
+                }
+                return View("OrderOverview", results);
+            }
+
+        }
+
         public async Task<List<Order>> getOrders()
         {
             var client = connectDynamoDb();
@@ -108,43 +151,6 @@ namespace BetterFurniture.Controllers
                 return null;
             }
             return orders;
-        }
-
-        // edit page
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditOrder(string id)
-        {
-            List<Order> orders =await getOrders();
-            if (orders != null)
-            {
-                Order order = orders.Find(x => x.OrderID == id);
-                if (order != null)
-                    return View(order);
-            }
-            return View();
-        }
-
-
-        public async Task<IActionResult> processEditOrder(Order order)
-        {
-            Console.WriteLine(order.ItemName);
-            string msg = await update_dynamodb(order);
-            TempData["msg"] = msg;
-            return RedirectToAction("OrderOverview", "OrderManagement");
-        }
-
-        public async Task<IActionResult> OrderStatus()
-        {
-            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
-            string userName = user.CustomerFullName;
-            List<Order> selected_orders = new List<Order>();
-            List<Order> all_orders = await getOrders();
-            foreach(var order in all_orders)
-            {
-                if (order.CustomerName.Equals(userName))
-                    selected_orders.Add(order);
-            }
-            return View(selected_orders);
         }
 
         public async Task<IActionResult> Delete(string id)
@@ -206,5 +212,31 @@ namespace BetterFurniture.Controllers
             }
             return "Updated Succesfully";
         }
+        private AmazonDynamoDBClient connectDynamoDb()
+        {
+            List<string> keys = getKeys();
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private AmazonSimpleNotificationServiceClient connectSNS()
+        {
+            List<string> keys = getKeys();
+            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private List<string> getKeys()
+        {
+            List<string> keys = new List<string>();
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+            IConfiguration config = builder.Build();
+
+            keys.Add(config["AWS:id"]);
+            keys.Add(config["AWS:key"]);
+            keys.Add(config["AWS:token"]);
+            return keys;
+        }
+
     }
 }

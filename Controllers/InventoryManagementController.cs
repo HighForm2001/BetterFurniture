@@ -13,6 +13,10 @@ using Microsoft.AspNetCore.Http;
 using BetterFurniture.Models.Repositories;
 using BetterFurniture.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using BetterFurniture.Areas.Identity.Data;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 
 namespace BetterFurniture.Controllers
 {
@@ -21,13 +25,52 @@ namespace BetterFurniture.Controllers
     {
         private const string s3name = "better-furniture-s3";
         private readonly FurnitureRepository _repository;
+        private readonly UserManager<BetterFurnitureUser> _userManager;
 
         // inject connection to the database
-        public InventoryManagementController(FurnitureRepository repository)
+        public InventoryManagementController(FurnitureRepository repository, UserManager<BetterFurnitureUser> userManager)
         {
             _repository = repository;
+            _userManager = userManager;
         }
 
+        // view
+        public async Task<IActionResult> InventoryOverview(List<Furniture>? searched_furniture)
+        {
+            // check subscription
+            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+            string msg = await checkSubscription(user);
+            Console.WriteLine(msg);
+            if (searched_furniture.Count() != 0)
+            {
+                return View(searched_furniture);
+            }
+            List<Furniture> furnitures = _repository.GetAll();
+            return View(furnitures);
+        }
+
+        public IActionResult CreateView(string? msg)
+        {
+            if (msg != null)
+            {
+                ViewBag.Msg = msg;
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> EditView(int id)
+        {
+            ViewBag.Msg = "";
+            if (TempData["msg"] != null){
+                ViewBag.Msg = TempData["msg"] as string;
+            }
+            Console.WriteLine("ViewBag.msg = " + ViewBag.Msg);
+            Models.Furniture furniture_to_edit = await _repository.GetByID(id);
+            return View(furniture_to_edit);
+        }
+
+        // functions
+        // search item
         public IActionResult Search(string query)
         {
             if (query == null)
@@ -48,35 +91,6 @@ namespace BetterFurniture.Controllers
                 return View("InventoryOverview", results);
             }
 
-        }
-
-        public IActionResult InventoryOverview(List<Furniture>? searched_furniture)
-        {
-            if (searched_furniture.Count() != 0)
-            {
-                return View(searched_furniture);
-            }
-            List<Furniture> furnitures = _repository.GetAll();
-            return View(furnitures);
-        }
-        public IActionResult CreateView(string? msg)
-        {
-            if (msg != null)
-            {
-                ViewBag.Msg = msg;
-            }
-            return View();
-        }
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditView(int id)
-        {
-            ViewBag.Msg = "";
-            if (TempData["msg"] != null){
-                ViewBag.Msg = TempData["msg"] as string;
-            }
-            Console.WriteLine("ViewBag.msg = " + ViewBag.Msg);
-            Models.Furniture furniture_to_edit = await _repository.GetByID(id);
-            return View(furniture_to_edit);
         }
         // create product 
         [HttpPost]
@@ -133,6 +147,11 @@ namespace BetterFurniture.Controllers
                 Console.WriteLine("TempData[msg] = " + TempData["msg"]);
                 return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
             }
+            if ((furniture.Name == null) || (furniture.Quantity < 0) || (furniture.Description==null) || (furniture.Price < 0))
+            {
+                TempData["msg"] = "Please refile the furniture information again. There is some error.";
+                return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
+            }
             if (ModelState.IsValid)
             {
                 _repository.Update(furniture);
@@ -144,7 +163,7 @@ namespace BetterFurniture.Controllers
         }
 
         // delete product
-        [Authorize(Roles = "Admin")]
+        
         public async Task<IActionResult> Delete(int id)
         {
             var furniture =await _repository.GetByID(id);
@@ -162,7 +181,6 @@ namespace BetterFurniture.Controllers
 
         // delete image url
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSingleImage(string imgUrl, int id)
         {
             // Delete the path from the ImageUrls property
@@ -190,12 +208,11 @@ namespace BetterFurniture.Controllers
         // update image
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
         public async Task<string> update_images(List<IFormFile> imageFile, string furniture_name, string furnitureUrl)
         {
             string url = "";
 
-            var s3client = connect();
+            var s3client = connectS3();
             foreach (var img in imageFile)
             {
                 if (img.Length <= 0)
@@ -262,17 +279,82 @@ namespace BetterFurniture.Controllers
         }
 
         // s3
-        private AmazonS3Client connect()
+        private AmazonS3Client connectS3()
         {
             List<string> values = getValues();
             var s3Client = new AmazonS3Client(values[0], values[1], values[2], RegionEndpoint.USEast1);
             return s3Client;
         }
 
+        private async Task<string> checkSubscription(BetterFurnitureUser user)
+        {
+            // retrieve an existing 
+            try
+            {
+                var client = connectSNS();
+                string topicARN = "arn:aws:sns:us-east-1:165343445807:BetterFurnitureAdmin";
+                string email = user.Email;
+
+                // check if the user is subscribed to the topic
+                var listSubscriptionsByTopicRequest = new ListSubscriptionsByTopicRequest
+                {
+                    TopicArn = topicARN
+                };
+                bool isSubscribed = false;
+                ListSubscriptionsByTopicResponse listSubscriptionsByTopicResponse;
+                do
+                {
+                    listSubscriptionsByTopicResponse = await client.ListSubscriptionsByTopicAsync(listSubscriptionsByTopicRequest);
+
+                    foreach (var subscription in listSubscriptionsByTopicResponse.Subscriptions)
+                    {
+                        if (subscription.Protocol == "email" && subscription.Endpoint == email)
+                        {
+                            isSubscribed = true;
+                            break;
+                        }
+                    }
+
+                    listSubscriptionsByTopicRequest.NextToken = listSubscriptionsByTopicResponse.NextToken;
+                } while (listSubscriptionsByTopicResponse.NextToken != null);
+                if (!isSubscribed)
+                {
+                    var subscribeRequest = new SubscribeRequest
+                    {
+                        TopicArn = topicARN,
+                        Protocol = "email",
+                        Endpoint = email,
+                    };
+                    /*subscribeRequest.Attributes.Add("Email", "true"); // got error*/
+                    var subscribeResponse = await client.SubscribeAsync(subscribeRequest);
+                    return subscribeResponse.ToString();
+                }
+                return "User already subscribed to the SNS";
+
+            }
+            catch (AmazonSimpleNotificationServiceException ex)
+            {
+                return ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+
+        }
+
+        private AmazonSimpleNotificationServiceClient connectSNS()
+        {
+            List<string> keys = getValues();
+            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
         public async Task<string> DeleteImage(string imgUrl, string name)
         {
             // add credential
-            var s3client = connect();
+            var s3client = connectS3();
             string imgName = imgUrl.Split("/").Last();
             string folder = "/images/" + name + "";
             try

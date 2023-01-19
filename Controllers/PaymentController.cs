@@ -34,6 +34,7 @@ namespace BetterFurniture.Controllers
             _userManager = userManager;
         }
 
+        // view
         public IActionResult ProceedPayment(string cart)
         {
             Cart cart_to_proceed = JsonConvert.DeserializeObject<Cart>(cart);
@@ -74,12 +75,14 @@ namespace BetterFurniture.Controllers
             List<Furniture> paid_furnitures = JsonConvert.DeserializeObject<List<Furniture>>(furnitures);
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
             string order_id = await createOrder(paid_furnitures, user, decimal.Parse(total));
+            Console.WriteLine(order_id);
             Order order = await getOrder(order_id);
-            string result = await subscribeEmail(user);
+            string result = await checkFurnitureQuantity();
             Console.WriteLine(result);
             return View(order);
         }
 
+        // functions
         public async Task<Order> getOrder(string orderID)
         {
             var client = connectDynamoDb();
@@ -144,7 +147,7 @@ namespace BetterFurniture.Controllers
 
                 Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
                     {
-                        {"CustomerName",new AttributeValue{S=user.CustomerFullName } }
+                        {"CustomerId",new AttributeValue{S=user.Id } }
                     };
                 DeleteItemRequest delete_request = new DeleteItemRequest
                 {
@@ -178,60 +181,36 @@ namespace BetterFurniture.Controllers
             return client;
         }
 
-        private async Task<string> subscribeEmail(BetterFurnitureUser user)
+        private async Task<string> checkFurnitureQuantity()
         {
-            // retrieve an existing 
+            var snsClient = connectSNS();
+            string topicArn = "arn:aws:sns:us-east-1:165343445807:BetterFurnitureAdmin";
+            List<Furniture> furnitures = _repository.GetAll();
             try
             {
-                var client = connectSNS();
-                string topicARN = "arn:aws:sns:us-east-1:165343445807:BetterFurnitureOrderNotification";
-                string email = user.Email;
-                
-                // check if the user is subscribed to the topic
-                var listSubscriptionsByTopicRequest = new ListSubscriptionsByTopicRequest
+                foreach (var furniture in furnitures)
                 {
-                    TopicArn = topicARN
-                };
-                bool isSubscribed = false;
-                ListSubscriptionsByTopicResponse listSubscriptionsByTopicResponse;
-                do
-                {
-                    listSubscriptionsByTopicResponse = await client.ListSubscriptionsByTopicAsync(listSubscriptionsByTopicRequest);
-
-                    foreach (var subscription in listSubscriptionsByTopicResponse.Subscriptions)
+                    if (furniture.Quantity < 5)
                     {
-                        if (subscription.Protocol == "email" && subscription.Endpoint == email)
+                        string msg = "Quantity of " + furniture.Name + " is lesser than 5. Current Quantity is " + furniture.Quantity;
+                        var publishRequest = new PublishRequest()
                         {
-                            isSubscribed = true;
-                            break;
-                        }
+                            TopicArn = topicArn,
+                            Message = msg
+                        };
+                        var publishResponse = await snsClient.PublishAsync(publishRequest);
                     }
-
-                    listSubscriptionsByTopicRequest.NextToken = listSubscriptionsByTopicResponse.NextToken;
-                } while (listSubscriptionsByTopicResponse.NextToken != null);
-                if (!isSubscribed)
-                {
-                    var subscribeRequest = new SubscribeRequest
-                    {
-                        TopicArn = topicARN,
-                        Protocol = "email",
-                        Endpoint = email,
-                    };
-                    /*subscribeRequest.Attributes.Add("Email", "true"); // got error*/
-                    var subscribeResponse = await client.SubscribeAsync(subscribeRequest);
-                    return subscribeResponse.ToString();
+                    
                 }
-                return "User already subscribed to the SNS";
-                
             }catch(AmazonSimpleNotificationServiceException ex)
             {
-                return ex.Message;
+                return "Error: " + ex.Message ;
             }catch(Exception ex)
             {
-                return ex.Message;
+                return "Error: " + ex.Message;
             }
-           
-
+            
+            return "Check successful.";
         }
 
         private AmazonSimpleNotificationServiceClient connectSNS()

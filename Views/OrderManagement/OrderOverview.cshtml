@@ -3,7 +3,13 @@
     ViewData["Title"] = "OrderOverview";
 }
 
-<h1>Order Management System</h1>
+<h1 class="title order">Order Management System</h1>
+
+<form method="get" class="search search-form" action="@Url.Action("Search", "OrderManagement")">
+    <input type="text" name="query" class="search search-bar" placeholder="Search for furniture">
+    <input type="submit" class="search search-button" value="Search">
+</form>
+
 
 <center>
     <h1>Purchase Order Information: </h1>
@@ -11,49 +17,57 @@
     <br /><hr /><br />
     @if (Model.Count > 0)
     {
-        <table border="1">
+        <table border="1" class="table-custom">
             <tr>
-                <th>Order ID</th>
-                <th>Customer Name</th>
-                <th>Shipping Address</th>
-                <th>Customer Email</th>
-                <th>Customer Phone</th>
-                <th>Status</th>
-                <th>Order Item(s)</th>
-                <th>Total Price</th>
-                <th>Action</th>
+                <th class="row-content">Order ID</th>
+                <th class="row-content">Customer Name</th>
+                <th class="row-content">Shipping Address</th>
+                <th class="row-content">Customer Email</th>
+                <th class="row-content">Customer Phone</th>
+                <th class="row-content">Status</th>
+                <th class="row-content">Order Item(s)</th>
+                <th class="row-content">Total Price</th>
+                <th class="row-content">Action</th>
             </tr>
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
+                    <td class="row-content">
                         @item.OrderID
                     </td>
-                    <td>@item.CustomerName</td>
-                    <td>@item.ShippingAddress</td>
-                    <td>@item.CustomerEmail</td>
-                    <td>@item.CustomerPhone</td>
-                    <td>@item.Status</td>
+                    <td class="row-content">@item.CustomerName</td>
+                    <td class="row-content">@item.ShippingAddress</td>
+                    <td class="row-content">@item.CustomerEmail</td>
+                    <td class="row-content">@item.CustomerPhone</td>
+                    <td class="row-content">@item.Status</td>
                     <td>
                         <ul>
                             @foreach (var order_item in item.ItemName)
                             {
-                                <li>@order_item</li>
+                                <li class="row-content">@order_item</li>
                             }
                         </ul>
                     </td>
-                    <td>@item.TotalPrice</td>
+                    <td class="row-content">@item.TotalPrice</td>
                     <td>
-                        <a asp-action="EditOrder" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Edit</a>
-                        <a asp-action="Delete" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Delete</a>
+                        <a class="link-submit" asp-action="EditOrder" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Edit</a>
+                        <a class="link-submit" asp-action="Delete" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Delete</a>
                     </td>
                 </tr>
             }
-        </table>      }
-            else
-            {
-                <span style="color:red">No Order is created.</span>
-            }
+        </table> }
+    else
+    {
+        @if (TempData["search"] != null)
+        {
+            <span style="color:red">@TempData["search"]</span>
+        }
+        else
+        {
+            <span style="color:red">No Order is created.</span>
+        }
+
+    }
 
 </center>
 

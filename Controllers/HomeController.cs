@@ -21,6 +21,7 @@ namespace BetterFurniture.Controllers
             _repository = repository;
         }
 
+        // views
         public IActionResult Index(List<Furniture>? searched_furniture)
         {
             if (searched_furniture.Count() != 0)
@@ -42,6 +43,7 @@ namespace BetterFurniture.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
         
+        // functions
         public IActionResult Search(string query)
         {
             if (query == null)

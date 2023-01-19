@@ -10,9 +10,9 @@ namespace BetterFurniture.Controllers
 {
     public class ProductController : Controller
     {
+        // views
         public IActionResult ProductDetails(string furniture)
         {
-            Console.WriteLine(furniture);
             Furniture passed_furniture = JsonConvert.DeserializeObject<Furniture>(furniture);
             return View(passed_furniture);
         }

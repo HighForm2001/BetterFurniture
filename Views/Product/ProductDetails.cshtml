@@ -3,9 +3,9 @@
     ViewData["Title"] = "Product Details - " + Model.Name;
 }
 
-<button class="back-button" onclick="window.history.back()">Go Back</button>
+<button class="btn-back" onclick="window.history.back()">Go Back</button>
 
-<h1>@Model.Name</h1>
+<h1 class="title product">@Model.Name</h1>
 <center>
     <div id="update_succesful_id"></div>
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
@@ -54,11 +54,11 @@
 <br />
 <hr />
 <div class="furniture-details" style="align-content:end;">
-    <p>@Model.Description</p>
-    <p>Price: $@Model.Price</p>
+    <p class="furniture-description">@Model.Description</p>
+    <p class="furniture-description">Price: $@Model.Price</p>
     @if (Model.Quantity > 0)
     {
-        <button class="btn btn-primary addToCartBtn" data-itemId="@Model.Name" onclick="addToCart(this)">Add to Cart</button>
+        <button class="btn-submit" class="btn btn-primary addToCartBtn" data-itemId="@Model.Name" onclick="addToCart(this)">Add to Cart</button>
     }
     else
     {

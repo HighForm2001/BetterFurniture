@@ -14,7 +14,12 @@ function addToCart(btn) {
         data: { itemName: itemId },
         success: function (data) {
             // Show a pop up notification to the user
-            alert("The following furniture has been added to your cart:\n"+itemId);
+            if (data.isAuthenticated) {
+                alert("The following furniture has been added to your cart:\n" + itemId);
+            } else {
+                alert("You need to log in to add items to the cart.");
+            }
+            
         },
         error: function (xhr, status, error) {
             // Handle errors here
@@ -24,21 +29,5 @@ function addToCart(btn) {
         }
     });
 }
-
-/*console.log("Javascript is running!")
-document.getElementById("addToCartBtn").addEventListener("click", function (event) {
-    var itemId = event.target.dataset.itemId;
-    $.ajax({
-        type: "POST",
-        url: "/Cart/AddToCart",
-        data: { itemName: itemId },
-        success: function (response) {
-            if (response.success) {
-                $('#addToCartModal').modal('show');
-            }
-        }
-    });
-});
-});*/
 
 

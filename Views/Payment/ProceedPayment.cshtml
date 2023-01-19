@@ -4,22 +4,22 @@
     ViewData["Title"] = "ProceedPayment";
 }
 
-<h1>ProceedPayment</h1>
+<h1 class="title payment">ProceedPayment</h1>
 
 @if (Model.Count == 0)
 {
-    <h1>No item is selected.</h1>
-    <a asp-controller="Home" asp-action="Index">Go Back</a>
+    <h1 class="alert-info">No item is selected.</h1>
+    <a class="link-submit" asp-controller="Home" asp-action="Index">Go Back</a>
 }
 else
 {
-    <table class="table">
+    <table class="table-custom">
         <thead>
             <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
+                <th class="row-content">Image</th>
+                <th class="row-content">Name</th>
+                <th class="row-content">Description</th>
+                <th class="row-content">Price</th>
             </tr>
         </thead>
         <tbody>
@@ -29,27 +29,27 @@ else
                     <td>
                         <img src="@item.ImageUrls.Split(",")[0]" width="200" height="200" />
                     </td>
-                    <td>@item.Name</td>
-                    <td>@item.Description</td>
-                    <td>@item.Price</td>
+                    <td class="row-content">@item.Name</td>
+                    <td class="row-content">@item.Description</td>
+                    <td class="row-content">@item.Price</td>
                 </tr>
             }
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="3"></td>
-                <td>Total:@ViewBag.total_price</td>
+                <td class="row-content">Total:@ViewBag.total_price</td>
             </tr>
         </tfoot>
     </table>
 
 
     <form asp-action="FinishPayment" asp-controller="Payment" method="post">
-        <input type="submit" value="Pay!" class="btn btn-primary submit-btn" style="float: right; margin-right: 10px;margin-bottom:20px;"
+        <input type="submit" value="Pay!" class="btn-submit" style="float: right; margin-right: 10px;margin-bottom:20px;"
                asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-total="@ViewBag.total_price" asp-action="FinishPayment" asp-controller="Payment" />
     </form>
     <form asp-action="CartPage" asp-controller="Cart">
-        <button type="submit" class="btn back-button" style="float: right; margin-right: 10px;margin-bottom:20px;">Cancel</button>
+        <button type="submit" class="btn-cancel" style="float: right; margin-right: 10px;margin-bottom:20px;">Cancel</button>
     </form>
 
 

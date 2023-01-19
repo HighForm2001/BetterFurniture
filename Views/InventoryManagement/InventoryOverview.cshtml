@@ -2,53 +2,54 @@
 @{
     ViewData["Title"] = "InventoryOverview";
 }
-@ViewBag
-<h1>Inventory Management Page</h1>
 
-<form method="get" action="@Url.Action("Search", "InventoryManagement")">
-    <input type="text" name="query" placeholder="Search for furniture">
-    <input type="submit" value="Search">
+<h1 class="title inventory">Inventory Management Page</h1>
+
+<form method="get" class="search search-form" action="@Url.Action("Search", "InventoryManagement")">
+    <input type="text" name="query" class="search search-bar" placeholder="Search for furniture">
+    <input type="submit" class="search search-button"  value="Search">
 </form>
 
 @if (Model.Count > 0)
 {
     <center>
-        <table>
+        <table class="table-custom ">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Urls</th>
-                    <th>Actions</th>
+                    <th class="row-content">ID</th>
+                    <th class="row-content">Name</th>
+                    <th class="row-content">Description</th>
+                    <th class="row-content">Price</th>
+                    <th class="row-content">Quantity</th>
+                    <th class="row-content">Urls</th>
+                    <th class="row-content">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var furniture in Model)
                 {
                     <tr>
-                        <td>@furniture.ID</td>
-                        <td>@furniture.Name</td>
-                        <td>@furniture.Description</td>
-                        <td>@furniture.Price</td>
-                        <td>@furniture.Quantity</td>
-                        <td>
+                        <td class="row-content">@furniture.ID</td>
+                        <td class="row-content">@furniture.Name</td>
+                        <td class="row-content">@furniture.Description</td>
+                        <td class="row-content">@furniture.Price</td>
+                        <td class="row-content">@furniture.Quantity</td>
+                        <td >
                             @foreach (var url in furniture.ImageUrls.Split(","))
                             {
                                 <img src="@url" width="200" height="200" />
                             }
                         </td>
                         <td>
-                            <a asp-action="EditView" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Edit</a>
-                            <a asp-action="Delete" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Delete</a>
+                            <a class="link-submit" asp-action="EditView" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Edit</a>
+                            <a class="link-submit" asp-action="Delete" asp-controller="InventoryManagement" asp-route-id="@furniture.ID">Delete</a>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-        <a asp-action="CreateView">Add New Furniture</a>
+        <br />
+        <a class="link-submit" asp-action="CreateView">Add New Furniture</a>
     </center>
 }
 else
