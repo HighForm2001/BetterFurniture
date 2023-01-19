@@ -104,6 +104,7 @@ namespace BetterFurniture.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+
             if (Input.CustomerFullName != user.CustomerFullName)
             {
                 user.CustomerFullName = Input.CustomerFullName;
