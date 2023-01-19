@@ -35,12 +35,8 @@ namespace BetterFurniture.Controllers
         }
 
         // view
-        public async Task<IActionResult> InventoryOverview(List<Furniture>? searched_furniture)
+        public IActionResult InventoryOverview(List<Furniture>? searched_furniture)
         {
-            // check subscription
-            BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
-            string msg = await checkSubscription(user);
-            Console.WriteLine(msg);
             if (searched_furniture.Count() != 0)
             {
                 return View(searched_furniture);
@@ -286,70 +282,7 @@ namespace BetterFurniture.Controllers
             return s3Client;
         }
 
-        private async Task<string> checkSubscription(BetterFurnitureUser user)
-        {
-            // retrieve an existing 
-            try
-            {
-                var client = connectSNS();
-                string topicARN = "arn:aws:sns:us-east-1:165343445807:BetterFurnitureAdmin";
-                string email = user.Email;
-
-                // check if the user is subscribed to the topic
-                var listSubscriptionsByTopicRequest = new ListSubscriptionsByTopicRequest
-                {
-                    TopicArn = topicARN
-                };
-                bool isSubscribed = false;
-                ListSubscriptionsByTopicResponse listSubscriptionsByTopicResponse;
-                do
-                {
-                    listSubscriptionsByTopicResponse = await client.ListSubscriptionsByTopicAsync(listSubscriptionsByTopicRequest);
-
-                    foreach (var subscription in listSubscriptionsByTopicResponse.Subscriptions)
-                    {
-                        if (subscription.Protocol == "email" && subscription.Endpoint == email)
-                        {
-                            isSubscribed = true;
-                            break;
-                        }
-                    }
-
-                    listSubscriptionsByTopicRequest.NextToken = listSubscriptionsByTopicResponse.NextToken;
-                } while (listSubscriptionsByTopicResponse.NextToken != null);
-                if (!isSubscribed)
-                {
-                    var subscribeRequest = new SubscribeRequest
-                    {
-                        TopicArn = topicARN,
-                        Protocol = "email",
-                        Endpoint = email,
-                    };
-                    /*subscribeRequest.Attributes.Add("Email", "true"); // got error*/
-                    var subscribeResponse = await client.SubscribeAsync(subscribeRequest);
-                    return subscribeResponse.ToString();
-                }
-                return "User already subscribed to the SNS";
-
-            }
-            catch (AmazonSimpleNotificationServiceException ex)
-            {
-                return ex.Message;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-
-
-        }
-
-        private AmazonSimpleNotificationServiceClient connectSNS()
-        {
-            List<string> keys = getValues();
-            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
-            return client;
-        }
+        
 
         public async Task<string> DeleteImage(string imgUrl, string name)
         {
