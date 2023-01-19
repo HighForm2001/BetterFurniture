@@ -7,6 +7,8 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using BetterFurniture.Models;
@@ -16,7 +18,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BetterFurniture.Controllers
 {
-    
+    [Authorize]
     public class OrderManagementController : Controller
     {
         private const string tableName = "BetterFurnitureOrder";
@@ -27,7 +29,21 @@ namespace BetterFurniture.Controllers
             _userManager = userManager;
         }
 
-        private AmazonDynamoDBClient connect()
+        private AmazonDynamoDBClient connectDynamoDb()
+        {
+            List<string> keys = getKeys();
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2],RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private AmazonSimpleNotificationServiceClient connectSNS()
+        {
+            List<string> keys = getKeys();
+            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private List<string> getKeys()
         {
             List<string> keys = new List<string>();
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
@@ -36,8 +52,7 @@ namespace BetterFurniture.Controllers
             keys.Add(config["AWS:id"]);
             keys.Add(config["AWS:key"]);
             keys.Add(config["AWS:token"]);
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2],RegionEndpoint.USEast1);
-            return client;
+            return keys;
         }
 
         // order page
@@ -63,7 +78,7 @@ namespace BetterFurniture.Controllers
         }
         public async Task<List<Order>> getOrders()
         {
-            var client = connect();
+            var client = connectDynamoDb();
             List<Order> orders = new List<Order>();
             try
             {
@@ -134,7 +149,7 @@ namespace BetterFurniture.Controllers
 
         public async Task<IActionResult> Delete(string id)
         {
-            var client = connect();
+            var client = connectDynamoDb();
             try
             {
                 Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
@@ -163,7 +178,7 @@ namespace BetterFurniture.Controllers
         [HttpPost]
         public async Task<string> update_dynamodb(Order order)
         {
-            var client = connect();
+            var client = connectDynamoDb();
             try
             {
                 Dictionary<string, AttributeValue> item = new Dictionary<string, AttributeValue>

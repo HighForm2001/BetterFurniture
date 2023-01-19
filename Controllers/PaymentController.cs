@@ -15,6 +15,8 @@ using Amazon.DynamoDBv2.Model;
 using BetterFurniture.Areas.Identity.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 
 namespace BetterFurniture.Controllers
 {
@@ -73,12 +75,14 @@ namespace BetterFurniture.Controllers
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
             string order_id = await createOrder(paid_furnitures, user, decimal.Parse(total));
             Order order = await getOrder(order_id);
+            string result = await subscribeEmail(user);
+            Console.WriteLine(result);
             return View(order);
         }
 
         public async Task<Order> getOrder(string orderID)
         {
-            var client = connect();
+            var client = connectDynamoDb();
             List<Order> Orders = new List<Order>();
             try
             {
@@ -112,7 +116,7 @@ namespace BetterFurniture.Controllers
 
         public async Task<string> createOrder(List<Furniture> furnitures, BetterFurnitureUser user, decimal totalPrice)
         {
-            var client = connect();
+            var client = connectDynamoDb();
             //create unique id 
             string uniqueId = Guid.NewGuid().ToString();
             
@@ -167,7 +171,77 @@ namespace BetterFurniture.Controllers
         }
 
         // DynamoDBClient
-        private AmazonDynamoDBClient connect()
+        private AmazonDynamoDBClient connectDynamoDb()
+        {
+            List<string> keys = getKeys();
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private async Task<string> subscribeEmail(BetterFurnitureUser user)
+        {
+            // retrieve an existing 
+            try
+            {
+                var client = connectSNS();
+                string topicARN = "arn:aws:sns:us-east-1:165343445807:BetterFurnitureOrderNotification";
+                string email = user.Email;
+                
+                // check if the user is subscribed to the topic
+                var listSubscriptionsByTopicRequest = new ListSubscriptionsByTopicRequest
+                {
+                    TopicArn = topicARN
+                };
+                bool isSubscribed = false;
+                ListSubscriptionsByTopicResponse listSubscriptionsByTopicResponse;
+                do
+                {
+                    listSubscriptionsByTopicResponse = await client.ListSubscriptionsByTopicAsync(listSubscriptionsByTopicRequest);
+
+                    foreach (var subscription in listSubscriptionsByTopicResponse.Subscriptions)
+                    {
+                        if (subscription.Protocol == "email" && subscription.Endpoint == email)
+                        {
+                            isSubscribed = true;
+                            break;
+                        }
+                    }
+
+                    listSubscriptionsByTopicRequest.NextToken = listSubscriptionsByTopicResponse.NextToken;
+                } while (listSubscriptionsByTopicResponse.NextToken != null);
+                if (!isSubscribed)
+                {
+                    var subscribeRequest = new SubscribeRequest
+                    {
+                        TopicArn = topicARN,
+                        Protocol = "email",
+                        Endpoint = email,
+                    };
+                    /*subscribeRequest.Attributes.Add("Email", "true"); // got error*/
+                    var subscribeResponse = await client.SubscribeAsync(subscribeRequest);
+                    return subscribeResponse.ToString();
+                }
+                return "User already subscribed to the SNS";
+                
+            }catch(AmazonSimpleNotificationServiceException ex)
+            {
+                return ex.Message;
+            }catch(Exception ex)
+            {
+                return ex.Message;
+            }
+           
+
+        }
+
+        private AmazonSimpleNotificationServiceClient connectSNS()
+        {
+            List<string> keys = getKeys();
+            AmazonSimpleNotificationServiceClient client = new AmazonSimpleNotificationServiceClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+            return client;
+        }
+
+        private List<string> getKeys()
         {
             List<string> keys = new List<string>();
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
@@ -176,8 +250,7 @@ namespace BetterFurniture.Controllers
             keys.Add(config["AWS:id"]);
             keys.Add(config["AWS:key"]);
             keys.Add(config["AWS:token"]);
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
-            return client;
+            return keys;
         }
     }
 }
