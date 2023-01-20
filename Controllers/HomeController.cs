@@ -1,4 +1,5 @@
-﻿using Amazon.SimpleNotificationService;
+﻿using Amazon;
+using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using BetterFurniture.Areas.Identity.Data;
 using BetterFurniture.Models;
