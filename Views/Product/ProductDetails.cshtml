@@ -55,7 +55,7 @@
     <hr />
     <div class="furniture-details" style="align-content:end;">
         <p class="furniture-description">@Model.Description</p>
-        <p class="furniture-description">Price: $@Model.Price</p>
+        <p class="furniture-description">Price: RM @Model.Price</p>
         @if (Model.Quantity > 0)
         {
     <button class="styledButton" style="--clr:#1e9bff" data-itemId="@Model.Name" onclick="addToCart(this)"><span>Add to Cart</span><i></i></button>

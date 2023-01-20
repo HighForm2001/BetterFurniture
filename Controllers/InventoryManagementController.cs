@@ -60,7 +60,6 @@ namespace BetterFurniture.Controllers
             if (TempData["msg"] != null){
                 ViewBag.Msg = TempData["msg"] as string;
             }
-            Console.WriteLine("ViewBag.msg = " + ViewBag.Msg);
             Models.Furniture furniture_to_edit = await _repository.GetByID(id);
             return View(furniture_to_edit);
         }
@@ -117,14 +116,13 @@ namespace BetterFurniture.Controllers
         public async Task<IActionResult> Edit(Furniture furniture, List<IFormFile> imageFile)
         {
             Console.WriteLine(imageFile.Count);
+            Console.WriteLine("Clicked edit");
             if (imageFile.Count > 0)
             {
-                Console.WriteLine("furniture.ImageUrls" + furniture.Name);
                 string urls = await update_images(imageFile, furniture.Name,furniture.ImageUrls);
                 furniture.ImageUrls += ","+urls;
                 if (furniture.ImageUrls.EndsWith(','))
                 {
-                    Console.WriteLine("Remove the last ','");
                     furniture.ImageUrls = furniture.ImageUrls[0..^1];
                 }
                 if (furniture.ImageUrls.StartsWith(","))
@@ -143,19 +141,11 @@ namespace BetterFurniture.Controllers
                 Console.WriteLine("TempData[msg] = " + TempData["msg"]);
                 return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
             }
-            if ((furniture.Name == null) || (furniture.Quantity < 0) || (furniture.Description==null) || (furniture.Price < 0))
-            {
-                TempData["msg"] = "Please refile the furniture information again. There is some error.";
-                return RedirectToAction("EditView", "InventoryManagement", new { id = furniture.ID });
-            }
-            if (ModelState.IsValid)
-            {
-                _repository.Update(furniture);
-                return RedirectToAction("InventoryOverview", "InventoryManagement");
-            }
-            TempData["msg"] = "Please fill in all the information";
-            Console.WriteLine("TempData[msg] = " + TempData["msg"]);
-            return RedirectToAction("EditView","InventoryManagement",new { id = furniture.ID });
+            
+            _repository.Update(furniture);
+            return RedirectToAction("InventoryOverview", "InventoryManagement");
+            
+            
         }
 
         // delete product
@@ -207,7 +197,8 @@ namespace BetterFurniture.Controllers
         public async Task<string> update_images(List<IFormFile> imageFile, string furniture_name, string furnitureUrl)
         {
             string url = "";
-
+            furniture_name = furniture_name.Replace(" ", "_");
+            Console.WriteLine("In update-images");
             var s3client = connectS3();
             foreach (var img in imageFile)
             {

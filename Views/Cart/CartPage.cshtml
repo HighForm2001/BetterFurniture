@@ -24,7 +24,7 @@
                 <tr>
                     <th class="row-content">Item Name</th>
                     <th class="row-content">Price</th>
-                    <th></th>
+                    <th>Action</th>
                 </tr>
                 @foreach (var item in Model.Cart.ItemName)
                 {
@@ -32,7 +32,7 @@
                     <tr>
                         <td><a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(furniture)">@item</a></td>
                         <td class="row-content">@furniture.Price</td>
-                        <td class="row-content">
+                        <td class="actions">
                             <form asp-action="RemoveFromCart" asp-controller="Cart" method="post">
                                 @*   <a class="styledButton" asp-action="Index" asp-controller="Home" style="--clr: #00ff21"><span>Buy More!</span><i></i>!</a>*@
                                 <button type="submit" class="styledButton" asp-action="RemoveFromCart" asp-route-itemName="@item" asp-route-cart_passed="@JsonConvert.SerializeObject(Model.Cart)"
@@ -42,8 +42,9 @@
                     </tr>
                 }
                 <tr>
-                    <th class="row-content">Total Price</th>
+                    <td class="row-content">Total Price</td>
                     <td class="row-content">@Model.Cart.total_price</td>
+                    <td></td>
                 </tr>
             </table>
             @if (ViewBag.PaymentError != null)

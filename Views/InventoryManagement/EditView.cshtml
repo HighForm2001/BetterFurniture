@@ -10,58 +10,94 @@
         </h1>
         <span style="color:red">@ViewBag.Msg</span>
         <form asp-action="Edit" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
-            <table border="1" class="table-custom">
-                <tr>
-                    <th class="row-content">Furniture ID</th>
-                    <td>
-                        <input class="row-content" asp-for="@Model.ID" readonly />
-                        <span class="row-content" asp-validation-for="@Model.ID" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="row-content">Furniture Name</th>
-                    <td>
-                        <input class="row-content" asp-for="@Model.Name" />
-                        <span class="row-content" asp-validation-for="@Model.Name" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="row-content">Description</th>
-                    <td>
-                        <textarea class="row-content text-box" asp-for="@Model.Description"></textarea>
-                        <span class="row-content" asp-validation-for="@Model.Description" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="row-content">Price</th>
-                    <td>
-                        <input class="row-content" asp-for="@Model.Price" type="number" min="0" step=".01" />
-                        <span class="row-content" asp-validation-for="@Model.Price" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="row-content">Quantity</th>
-                    <td>
-                        <input class="row-content" asp-for="@Model.Quantity" type="number" min="1" step="1" />
-                        <span class="row-content" asp-validation-for="@Model.Quantity" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th style="display:none">Url</th>
-                    <td>
-                        <input asp-for="@Model.ImageUrls" style="display:none" />
-                        <span asp-validation-for="@Model.ImageUrls" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="row-content">Insert Pictures</th>
-                    <td>
-                        <input class="btn-submit" type="file" name="imageFile" accept="image/*" multiple />
-                    </td>
-                </tr>
-            </table>
+            <div class="form-group" style="display:none">
+                <input asp-for="@Model.ID" required="required" readonly />
+                <label asp-for="@Model.ID"></label>
+                <span asp-validation-for="@Model.ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Name" required="required" />
+                <label asp-for="@Model.Name"></label>
+                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <textarea asp-for="@Model.Description" required="required"></textarea>
+                <label asp-for="@Model.Description"></label>
+                <span asp-validation-for="@Model.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Price" required="required" />
+                <label asp-for="@Model.Price"></label>
+                <span asp-validation-for="@Model.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Quantity" required="required" />
+                <label asp-for="@Model.Quantity"></label>
+                <span asp-validation-for="@Model.Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group" style="display:none">
+                <input asp-for="@Model.ImageUrls" required="required" />
+                <label asp-for="@Model.ImageUrls"></label>
+                <span asp-validation-for="@Model.ImageUrls" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="alert">Insert Pictures</label>
+                <input class="btn-submit" type="file" name="imageFile" accept="image/*" multiple />
+
+                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+            </div>
+            @*<table border="1" class="table-custom">
+            <tr>
+                <th class="row-content">Furniture ID</th>
+                <td>
+                    <input class="row-content" asp-for="@Model.ID" readonly />
+                    <span class="row-content" asp-validation-for="@Model.ID" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-content">Furniture Name</th>
+                <td>
+                    <input class="row-content" asp-for="@Model.Name" />
+                    <span class="row-content" asp-validation-for="@Model.Name" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-content">Description</th>
+                <td>
+                    <textarea class="row-content text-box" asp-for="@Model.Description"></textarea>
+                    <span class="row-content" asp-validation-for="@Model.Description" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-content">Price</th>
+                <td>
+                    <input class="row-content" asp-for="@Model.Price" type="number" min="0" step=".01" />
+                    <span class="row-content" asp-validation-for="@Model.Price" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-content">Quantity</th>
+                <td>
+                    <input class="row-content" asp-for="@Model.Quantity" type="number" min="1" step="1" />
+                    <span class="row-content" asp-validation-for="@Model.Quantity" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th style="display:none">Url</th>
+                <td>
+                    <input asp-for="@Model.ImageUrls" style="display:none" />
+                    <span asp-validation-for="@Model.ImageUrls" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th class="row-content">Insert Pictures</th>
+                <td>
+                    <input class="btn-submit" type="file" name="imageFile" accept="image/*" multiple />
+                </td>
+            </tr>
+        </table>*@
             <br />
-            <button type="submit" class="styledButton" style="--clr:#00ff21"><span>Edit Furniture @Model.Name</span><i></i></button>
+            <button type="submit" class="styledButton" style="--clr:#00ff21"><span>Edit Furniture: @Model.Name</span><i></i></button>
         </form>
         <br />
         <form asp-action="DeleteSingleImage" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">

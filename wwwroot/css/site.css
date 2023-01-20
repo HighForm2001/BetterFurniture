@@ -7,14 +7,7 @@ for details on configuring this project to bundle and minify static web assets. 
     box-sizing:border-box;
     font-family:'Poppins',sans-serif
 }
-.actions {
-    display: flex;
-    flex-direction: column;
-    gap:2px;
-}
-.actions a{
-    text-align:center;
-}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -37,11 +30,71 @@ a {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+/*header*/
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.6s;
+    padding:40px 100px;
+    z-index:100000;
+}
+header .logo{
+    position:relative;
+    font-weight:700;
+    color:#fff;
+    text-decoration:none;
+    font-size:2em;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    transition:0.6s;
+    padding:-30px;
+}
+    header.sticky {
+        background: #000000;
+        padding: 5px 100px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+header ul{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
+}
+header ul li{
+    position:relative;
+    list-style:none;
+}
+header ul li a, header ul li .btn-link{
+    position:relative;
+    margin:0 10px;
+    text-decoration:none;
+    color:#fff;
+    letter-spacing:2px;
+    font-weight:500;
+    transition:0.5s;
+}
+.banner {
+    position: relative;
+    width: 100%;
+    height: 10vh;
+    background: #000000;
+    background-size: cover;
+}
+header.sticky .logo,
+header.sticky ul li a, header.sticky ul li .btn-link {
+    color: #fff;
+
+}
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 @media (min-width: 768px) {
   html {
@@ -83,219 +136,54 @@ html {
 
 body {
     /* Margin bottom by footer height */
+    margin-top:60px;
     margin-bottom: 60px;
     /*display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     background: #333;*/
+    background:#000000;
 }
-/*furniture image*/
-
-.furniture-image {
-    max-width: 500px; /* or any desired width */
-    max-height: 500px; /* or any desired height */
-
+h1,h2,h3,h4,p,td,th,.btn-link,label{
+    color:#fff
 }
-
-.carousel {
-    position: relative;
-    width: 500px; /* or any desired width */
-    height: 500px; /* or any desired height */
+.btn-link{
+    background:none;
+    border:none;
 }
 
-.carousel-control-prev, .carousel-control-next {
-    position: absolute;
-    width: auto;
-    top:50%;
-    padding-top: 0;
-    margin-top: -22px;
-    color:darkred;
-    font-size: 36px;
-    background-color:black;
-    max-block-size:50px;
+p.card-text {
+    color: #000000;
+}
+#account{
+    margin-right:30px;
+}
+.special-img{
+    margin-left:150px;
+    float:left;
 }
 
-.carousel-control-prev {
-    left: auto;
+select {
+    background-color: #00df34;
+    color: white;
+    border: solid 2px #1e9bff;
+    text-shadow: 0 0 10px #1e9bff;
 }
 
-.carousel-control-next {
-    right: 0;
-}
-.carousel-inner{ /* or any desired width */
-    margin: auto;
-    position:center;
-}
-
-.out-of-stock-button{
-    color:red;
-}
-
-
-
-/*home.index*/
-/*.container{
-    position:relative;
-    display:flex;
-    padding:80px 40px;
-    justify-content:center;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:80px;
-}
-
-.card{
-    position:relative;
-    width:350px;
-    height:180px;
-    background:#fff;
-    transition:0.5s;
-}
-
-.card:hover{
-    height:450px;
-}
-
-.card .lines{
-    position:absolute;
-    inset:0;
-    background:#000;
-    overflow:hidden;
-}
-.card .lines::before {
-    content: '';
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    width: 600px;
-    height: 120px;
-    transform: translate(-50%,50%);
-    background: linear-gradient(transparent,#45f3ff,#45f3ff,#45f3ff,transparent);
-    animation: home 4s linear infinite;
-    animation-play-state: paused;
-}
-.card:hover .lines::before {
-        animation-play-state: running;
-}
-@keyframes home{
-    0%
-    {
-        transform: translate(-50%,50%) rotate(0deg);
+    /* Change select option background color on hover */
+    select option:hover {
+        background-color: #00df34;
+        color: white;
     }
-    100% {
-        transform: translate(-50%,50%) rotate(360deg);
-    }
-}
-.card .lines::after {
-    content: '';
-    position: absolute;
-    inset:3px;
-    background:#292929;
-}
-.card .imgBx{
-    position:absolute;
-    top:-60px;
-    left:50%;
-    width:150px;
-    height:150px;
-    transform:translateX(-50%);
-    background:#000;
-    transition:0.5s;
-    z-index:10;
-    overflow:hidden;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-.card:hover .imgBx{
-    top:25px;
-    width:200px;
-    height:200px;
-}
-.card .imgBx::before {
-    content: '';
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    width: 500px;
-    height: 150px;
-    transform: translate(-50%,50%);
-    background: linear-gradient(transparent,#ff3c7b,#ff3c7b,#ff3c7b,transparent);
-    animation: home2 6s linear infinite;
-    animation-play-state:paused;
-}
-.card:hover .imgBx::before{
-    animation-play-state:running;
-}
-@keyframes home2{
-    0% {
-        transform: translate(-50%,50%) rotate(360deg);
+    select:focus {
+        border: solid 2px #ff0000;
     }
 
-    100% {
-        transform: translate(-50%,50%) rotate(0deg);
+    /* Change select background color when being interacted with */
+    select:active {
+        background-color: #00df34;
     }
-}
-.card .imgBx:after{
-    content:'';
-    position:absolute;
-    inset:3px;
-    background:#292929;
-}
-.card .imgBx:after img{
-    position:absolute;
-    z-index:1;
-    filter:invert(1);*/ /*这个可以不要 因为是家具*/
-    /*opacity:0.5;
-    transition:0.5s;
-}
-.card:hover .imgBx img{
-    opacity:1;
-}
-.card .content{
-    position:absolute;
-    width:100%;
-    height:100%;
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    overflow:hidden;
-}
-.card .content .details{
-    padding:30px 20px;
-    text-align:center;
-    width:100%;
-    transition:0.5s;
-    transform:translateY(145px);
-}
-.card:hover .content .details{
-    transform: translateY(0px);
-}
-.card .content .details h2{
-    font-size:1.5em;
-    font-weight:500;
-    color:#45f3ff;
-    line-height:1.2m;
-}
-.card .content .details p{
-    color:#fff;
-    opacity:0;
-    transition:0.5s;
-}
-
-.card .content .details button{
-    display:inline-block;
-    padding:8px 15px;
-    background:#45f3ff;
-    color:#292929;
-    margin-top:10px;
-    font-weight:500;
-    text-decoration:none;
-    opacity:0;
-    transition:0.5s;
-}
-.card:hover .content .details button,
-.card:hover .content .details p {
-    opacity:1;
-}*/
+    select:hover {
+        transform: scale(1.05);
+    }

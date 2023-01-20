@@ -74,6 +74,8 @@ namespace BetterFurniture.Controllers
         {
             List<Furniture> paid_furnitures = JsonConvert.DeserializeObject<List<Furniture>>(furnitures);
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
+            if ((user.PhoneNumber == "") || (user.PhoneNumber == null) || (user.CustomerAddress == "") || (user.CustomerAddress == null))
+                return View(null);
             string order_id = await createOrder(paid_furnitures, user, decimal.Parse(total));
             Console.WriteLine(order_id);
             Order order = await getOrder(order_id);

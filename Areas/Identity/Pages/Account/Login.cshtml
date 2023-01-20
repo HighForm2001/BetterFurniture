@@ -15,14 +15,15 @@
                 <h4>Use a local account to log in.</h4>
                 <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
-                <div class="form-group">
+                <div class="form-group" style="width:300px">
+
+                    <input asp-for="Input.Email" required="required" style="width:300px"/>
                     <label asp-for="Input.Email"></label>
-                    <input asp-for="Input.Email" class="form-control" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="width:300px">
+                    <input asp-for="Input.Password" required="required" style="width:300px"/>
                     <label asp-for="Input.Password"></label>
-                    <input asp-for="Input.Password" class="form-control" />
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -34,7 +35,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Log in</button>
+                    <button type="submit" class="styledButton" style="--clr:#1e9bff"><span>Log in</span><i></i></button>
                 </div>
                 <div class="form-group">
                     <p>
@@ -49,7 +50,7 @@
     </div>
     <div class="col-md-6 col-md-offset-2">
 
-        <img src="https://img1.baidu.com/it/u=1863658362,1900231342&fm=253&fmt=auto&app=138&f=JPEG?w=891&h=500">
+        <img class="special-img" src="https://img1.baidu.com/it/u=1863658362,1900231342&fm=253&fmt=auto&app=138&f=JPEG?w=891&h=500" style="margin-left:10px">
 
     </div>
         @*<div class="col-md-6 col-md-offset-2">

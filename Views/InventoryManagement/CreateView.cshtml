@@ -11,43 +11,70 @@
         </h1>
         <span style="color:crimson">@ViewBag.Msg</span>
         <form asp-action="Create" asp-controller="InventoryManagement" method="post" enctype="multipart/form-data">
-            <table border="1" class="table-custom">
-                <tr class="row-title">
-                    <th class="row-content">Furniture Name</th>
-                    <td>
-                        <input class="row-content" asp-for="Name" />
-                        <span class="row-content" asp-validation-for="Name" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr class="row-title">
-                    <th class="row-content">Description</th>
-                    <td>
-                        <textarea class="row-content text-box" asp-for="Description"></textarea>
-                        <span class="row-content" asp-validation-for="Description" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr class="row-title">
-                    <th class="row-content">Price</th>
-                    <td>
-                        <input class="row-content" asp-for="Price" type="number" min="0" step=".01" />
-                        <span class="row-content" asp-validation-for="Price" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr class="row-title">
-                    <th class="row-content">Quantity</th>
-                    <td>
-                        <input class="row-content" asp-for="Quantity" type="number" min="1" step="1" />
-                        <span class="row-content" asp-validation-for="Quantity" class="text-danger"></span>
-                    </td>
-                </tr>
-                <tr class="row-title">
-                    <th class="row-content">Furniture Images</th>
-                    <td>
-                        <input type="file" name="imageFile" accept="image/*" multiple />
-                    </td>
-                </tr>
-            </table>
-            <input class="btn-submit" type="submit" value="Create Furniture" />
+            <div class="form-group">
+                <input asp-for="@Model.Name" required="required" />
+                <label asp-for="@Model.Name"></label>
+                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Description" required="required" />
+                <label asp-for="@Model.Description"></label>
+                <span asp-validation-for="@Model.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Price" required="required" />
+                <label asp-for="@Model.Price"></label>
+                <span asp-validation-for="@Model.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="@Model.Quantity" required="required" />
+                <label asp-for="@Model.Quantity"></label>
+                <span asp-validation-for="@Model.Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="alert">Insert Pictures</label>
+                <input class="btn-submit" type="file" name="imageFile" accept="image/*" multiple />
+            </div>
+            @*<table border="1" class="table-custom">
+            <tr class="row-title">
+                <th class="row-content">Furniture Name</th>
+                <td>
+                    <input class="row-content" asp-for="Name" />
+                    <span class="row-content" asp-validation-for="Name" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr class="row-title">
+                <th class="row-content">Description</th>
+                <td>
+                    <textarea class="row-content text-box" asp-for="Description"></textarea>
+                    <span class="row-content" asp-validation-for="Description" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr class="row-title">
+                <th class="row-content">Price</th>
+                <td>
+                    <input class="row-content" asp-for="Price" type="number" min="0" step=".01" />
+                    <span class="row-content" asp-validation-for="Price" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr class="row-title">
+                <th class="row-content">Quantity</th>
+                <td>
+                    <input class="row-content" asp-for="Quantity" type="number" min="1" step="1" />
+                    <span class="row-content" asp-validation-for="Quantity" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr class="row-title">
+                <th class="row-content">Furniture Images</th>
+                <td>
+                    <input type="file" name="imageFile" accept="image/*" multiple />
+                </td>
+            </tr>
+                 <button class="styledButton" type="submit" asp-route-cart="@JsonConvert.SerializeObject(Model.Cart)"
+                        asp-action="ProceedPayment" asp-controller="Payment" style="--clr: #1fec10"><span>Proceed Payment</span><i></i></button>
+        </table>*@
+
+            <button class="styledButton"  type="submit" style="--clr: #00ffef" ><span>Create furniture!</span><i></i></button>
         </form>
     </center>
 </body>

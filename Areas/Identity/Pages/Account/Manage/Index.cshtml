@@ -13,34 +13,38 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Username"></label>
-                <input asp-for="Username" class="form-control" disabled />
+                <input asp-for="Username" disabled required="required"/>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.PhoneNumber" required="required" />
                 <label asp-for="Input.PhoneNumber"></label>
-                <input asp-for="Input.PhoneNumber" class="form-control" />
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.CustomerFullName" required="required" />
                 <label asp-for="Input.CustomerFullName"></label>
-                <input asp-for="Input.CustomerFullName" class="form-control" />
                 <span asp-validation-for="Input.CustomerFullName" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.CustomerAge" required="required" />
                 <label asp-for="Input.CustomerAge"></label>
-                <input asp-for="Input.CustomerAge" class="form-control" />
                 <span asp-validation-for="Input.CustomerAge" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <textarea asp-for="Input.CustomerAddress" required="required"></textarea>
                 <label asp-for="Input.CustomerAddress"></label>
-                <textarea  asp-for="Input.CustomerAddress" class="form-control" > </textarea>
                 <span asp-validation-for="Input.CustomerAddress" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <input asp-for="Input.CustomerDOB" required="required" />
                 <label asp-for="Input.CustomerDOB"></label>
-                <input asp-for="Input.CustomerDOB" class="form-control" />
                 <span asp-validation-for="Input.CustomerDOB" class="text-danger"></span>
             </div>
-            <button id="update-profile-button" type="submit" class="btn btn-primary">Save</button>
+            <button id="update-profile-button" type="submit" class="styledButton" style="--clr:#1e9bff"><span>Save</span><i></i></button>
         </form>
     </div>
 </div>

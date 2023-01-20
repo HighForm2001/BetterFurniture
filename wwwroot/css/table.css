@@ -1,0 +1,52 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    box-shadow: 0 0 20px #1e9bff;
+    border-radius: 10px;
+    transition: all 0.5s ease-in-out;
+    background-color: #ffffff;
+    margin-bottom:20px;
+}
+
+/* Table Headings */
+th {
+    background-color: #000000;
+    color: white;
+    text-align: left;
+    padding: 10px;
+}
+
+/* Table Rows */
+td, th {
+    text-align: left;
+    padding: 10px;
+}
+th {
+    color: #ffffff;
+}
+td{
+    color:#000000;
+}
+tr{
+    transition:0.5s;
+}
+
+
+    /* Table Row Hover Effect */
+tbody tr:hover {
+    background-color: #8e8383;
+    box-shadow: 0 0 20px #808080;
+    border-radius: 10px;
+}
+tfoot tr:hover {
+    background-color: #8e8383;
+    box-shadow: 0 0 20px #808080;
+    border-radius: 10px;
+    margin-bottom:10px;
+}
+td ul {
+    max-width: 200px; /* adjust as needed */
+    overflow-x: auto; /* add scrollbar if needed */
+}

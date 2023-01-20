@@ -13,28 +13,33 @@
             <hr />
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
+
+                <input asp-for="Input.Email" required="required" />
                 <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.Password" required="required" />
                 <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.ConfirmPassword" required="required" />
                 <label asp-for="Input.ConfirmPassword"></label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.CustomerFullName" required="required" />
                 <label asp-for="Input.CustomerFullName"></label>
-                <input asp-for="Input.CustomerFullName" class="form-control" />
                 <span asp-validation-for="Input.CustomerFullName" class="text-danger"></span>
             </div>
             <div class="form-group">
+
+                <input asp-for="Input.CustomerAge" required="required" />
                 <label asp-for="Input.CustomerAge"></label>
-                <input asp-for="Input.CustomerAge" class="form-control" />
                 <span asp-validation-for="Input.CustomerAge" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -44,15 +49,16 @@
             </div>
             @*<div class="form-group">
             <label asp-for="Input.CustomerAddress"></label>
-            <input asp-for="Input.CustomerAddress" class="form-control" />
+            <input asp-for="Input.CustomerAddress"  />
             <span asp-validation-for="Input.CustomerAddress" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="Input.CustomerDOB"></label>
-            <input asp-for="Input.CustomerDOB" class="form-control" />
+            <input asp-for="Input.CustomerDOB"  />
             <span asp-validation-for="Input.CustomerDOB" class="text-danger"></span>
         </div>*@
-            <button type="submit" class="btn btn-primary">Register</button>
+            @* <button class="styledButton" style="--clr:#1e9bff"*@
+            <button type="submit" class="styledButton" style="--clr:#1e9bff"><span>Register</span><i></i></button>
         </form>
     </div>
     <div class="col-md-6 col-md-offset-2">

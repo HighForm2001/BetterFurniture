@@ -1,0 +1,58 @@
+﻿.card {
+    background: linear-gradient(to right, #333333, #3c3c3c);
+    color: white;
+    border: solid 2px #1e9bff;
+    text-shadow: 0 0 10px #1e9bff;
+    box-shadow: 0 0 20px #1e9bff;
+    transition: 0.5s;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    .card:hover {
+        border: solid 2px #ff0000;
+        text-shadow: 0 0 10px #ff0000;
+        box-shadow: 0 0 20px #ff0000;
+        transform: scale(1.05);
+    }
+
+    .card img {
+        max-width: 100%;
+        transition: all 0.3s ease-in-out;
+        filter: blur(0px);
+        transform: scale(1);
+
+    }
+
+    .card:hover img {
+        filter: blur(2px);
+        transform: scale(1.1);
+    }
+
+    .card h5 a{
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease-in-out;
+        color:#00ff15;
+    }
+
+    .card p {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease-in-out;
+        color: #00ff15;
+        font-weight:300;
+
+    }
+
+    .card:hover h5 {
+        color: #ff0000;
+        text-shadow: 0 0 10px #ff0000;
+    }
+
+    .card:hover p {
+        color: #ff0000;
+        text-shadow: 0 0 10px #ff0000;
+    }
+}

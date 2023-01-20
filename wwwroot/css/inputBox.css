@@ -1,0 +1,44 @@
+﻿.form-group{
+    position:relative;
+    width:500px;
+}
+.form-group input, .form-group textarea, .form-group ul{
+    width:100%;
+    padding:10px;
+    border:1px solid rgba(255,255,255,0.25);
+    background:#000000;
+    border-radius:5px;
+    outline:none;
+    color:#fff;
+    font-size:1em;
+    transition:0.5s;
+}
+.form-group label {
+    position:absolute;
+    left:0;
+    padding:10px;
+    pointer-events:none;
+    font-size:1em;
+    color:rgba(255,255,255,0.25);
+    text-transform:uppercase;
+    transition:0.5s;
+}
+
+    .form-group input:valid ~ label, .form-group textarea:valid ~ label,
+    .form-group input:focus ~ label, .form-group textarea:focus ~ label,
+    .form-group .stay-at-top {
+        color: #00dfc4;
+        transform: translateX(10px) translateY(-10px);
+        font-size: 0.65em;
+        padding: 0px 10px;
+        background: #000000;
+        border-left: 1px solid #00dfc4;
+        border-right: 1px solid #00dfc4;
+        letter-spacing: 0.2em;
+    }
+
+.form-group input:valid, .form-group textarea:valid,
+.form-group input:focus, .form-group textarea:focus,
+.form-group .stay-at-top-ta{
+    border: 1px solid #00df34;
+}
