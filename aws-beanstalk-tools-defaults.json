@@ -8,7 +8,7 @@
     "environment"    : "BetterFurniture-dev",
     "enable-xray"    : true,
     "enhanced-health-type" : "enhanced",
-    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-00ef7911f407e9f59,sg-0c5d78c00e721deae\";\"aws:ec2:vpc,Subnets\"=\"subnet-028601776cf1e3253\"",
+    "additional-options"   : "",
     "solution-stack"       : "64bit Amazon Linux 2 v2.4.3 running .NET Core",
     "environment-type"     : "SingleInstance",
     "cname"                : "betterfurniture-dev",
