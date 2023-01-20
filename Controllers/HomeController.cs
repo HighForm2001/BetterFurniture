@@ -150,8 +150,6 @@ namespace BetterFurniture.Controllers
             {
                 return ex.Message;
             }
-
-
         }
 
         private AmazonSimpleNotificationServiceClient connectSNS()

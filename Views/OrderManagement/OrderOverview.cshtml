@@ -3,71 +3,77 @@
     ViewData["Title"] = "OrderOverview";
 }
 
-<h1 class="title order">Order Management System</h1>
-
-<form method="get" class="search search-form" action="@Url.Action("Search", "OrderManagement")">
-    <input type="text" name="query" class="search search-bar" placeholder="Search for furniture">
-    <input type="submit" class="search search-button" value="Search">
-</form>
-
-
-<center>
-    <h1>Purchase Order Information: </h1>
-    <span style="color:@ViewBag.color">@ViewBag.Msg</span>
-    <br /><hr /><br />
-    @if (Model.Count > 0)
-    {
-        <table border="1" class="table-custom">
-            <tr>
-                <th class="row-content">Order ID</th>
-                <th class="row-content">Customer Name</th>
-                <th class="row-content">Shipping Address</th>
-                <th class="row-content">Customer Email</th>
-                <th class="row-content">Customer Phone</th>
-                <th class="row-content">Status</th>
-                <th class="row-content">Order Item(s)</th>
-                <th class="row-content">Total Price</th>
-                <th class="row-content">Action</th>
-            </tr>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td class="row-content">
-                        @item.OrderID
-                    </td>
-                    <td class="row-content">@item.CustomerName</td>
-                    <td class="row-content">@item.ShippingAddress</td>
-                    <td class="row-content">@item.CustomerEmail</td>
-                    <td class="row-content">@item.CustomerPhone</td>
-                    <td class="row-content">@item.Status</td>
-                    <td>
-                        <ul>
-                            @foreach (var order_item in item.ItemName)
-                            {
-                                <li class="row-content">@order_item</li>
-                            }
-                        </ul>
-                    </td>
-                    <td class="row-content">@item.TotalPrice</td>
-                    <td>
-                        <a class="link-submit" asp-action="EditOrder" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Edit</a>
-                        <a class="link-submit" asp-action="Delete" asp-controller="OrderManagement" asp-route-id="@item.OrderID">Delete</a>
-                    </td>
-                </tr>
-            }
-        </table> }
-    else
-    {
-        @if (TempData["search"] != null)
+<body>
+    <h1 class="title order">Order Management System</h1>
+    <div class="searchBox">
+        <div class="search" onclick="searchBox()"><ion-icon name="search-outline"></ion-icon></div>
+        <div class="searchInput">
+            <form method="get" class="search search-form" action="@Url.Action("Search", "OrderManagement")">
+                <input class="search-text" type="text" name="query" placeholder="Search for Customer">
+            </form>
+        </div>
+        <div class="close" onclick="closeBox()"><ion-icon name="close-outline"></ion-icon></div>
+    </div>
+    <center>
+        <span style="color:@ViewBag.color">@ViewBag.Msg</span>
+        <br /><hr /><br />
+        @if (Model.Count > 0)
         {
-            <span style="color:red">@TempData["search"]</span>
-        }
+            <table border="1" class="table-custom">
+                <tr>
+                    <th class="row-content">Order ID</th>
+                    <th class="row-content">Customer Name</th>
+                    <th class="row-content">Shipping Address</th>
+                    <th class="row-content">Customer Email</th>
+                    <th class="row-content">Customer Phone</th>
+                    <th class="row-content">Status</th>
+                    <th class="row-content">Order Item(s)</th>
+                    <th class="row-content">Total Price</th>
+                    <th class="row-content">Action</th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="row-content">
+                            @item.OrderID
+                        </td>
+                        <td class="row-content">@item.CustomerName</td>
+                        <td class="row-content">@item.ShippingAddress</td>
+                        <td class="row-content">@item.CustomerEmail</td>
+                        <td class="row-content">@item.CustomerPhone</td>
+                        <td class="row-content">@item.Status</td>
+                        <td>
+                            <ul>
+                                @foreach (var order_item in item.ItemName)
+                                {
+                                    <li class="row-content">@order_item</li>
+                                }
+                            </ul>
+                        </td>
+                        <td class="row-content">@item.TotalPrice</td>
+                        <td class="actions">
+                            <a class="styledButton" asp-action="EditOrder" asp-controller="OrderManagement" asp-route-id="@item.OrderID"
+                               style="--clr: #a1f37c"><span>Edit</span><i></i></a>
+                            <a class="styledButton" asp-action="Delete" asp-controller="OrderManagement" asp-route-id="@item.OrderID"
+                               style="--clr: #fc7bc0"><span>Delete</span><i></i></a>
+                        </td>
+                    </tr>
+                }
+            </table> }
         else
         {
-            <span style="color:red">No Order is created.</span>
+            @if (TempData["search"] != null)
+            {
+                <span style="color:red">@TempData["search"]</span>
+            }
+            else
+            {
+                <span style="color:red">No Order is created.</span>
+            }
+
         }
 
-    }
+    </center>
 
-</center>
+</body>
 

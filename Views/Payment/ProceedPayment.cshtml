@@ -3,54 +3,57 @@
 @{
     ViewData["Title"] = "ProceedPayment";
 }
+<body>
+    <h1 class="title payment">ProceedPayment</h1>
 
-<h1 class="title payment">ProceedPayment</h1>
-
-@if (Model.Count == 0)
-{
-    <h1 class="alert-info">No item is selected.</h1>
-    <a class="link-submit" asp-controller="Home" asp-action="Index">Go Back</a>
-}
-else
-{
-    <table class="table-custom">
-        <thead>
-            <tr>
-                <th class="row-content">Image</th>
-                <th class="row-content">Name</th>
-                <th class="row-content">Description</th>
-                <th class="row-content">Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    @if (Model.Count == 0)
+    {
+        <h1 class="alert-info">No item is selected.</h1>
+        <a class="link-submit" asp-controller="Home" asp-action="Index">Go Back</a>
+    }
+    else
+    {
+        <table class="table-custom">
+            <thead>
                 <tr>
-                    <td>
-                        <img src="@item.ImageUrls.Split(",")[0]" width="200" height="200" />
-                    </td>
-                    <td class="row-content">@item.Name</td>
-                    <td class="row-content">@item.Description</td>
-                    <td class="row-content">@item.Price</td>
+                    <th class="row-content">Image</th>
+                    <th class="row-content">Name</th>
+                    <th class="row-content">Description</th>
+                    <th class="row-content">Price</th>
                 </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3"></td>
-                <td class="row-content">Total:@ViewBag.total_price</td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item.ImageUrls.Split(",")[0]" width="200" height="200" />
+                        </td>
+                        <td class="row-content">@item.Name</td>
+                        <td class="row-content">@item.Description</td>
+                        <td class="row-content">@item.Price</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"></td>
+                    <td class="row-content">Total:@ViewBag.total_price</td>
+                </tr>
+            </tfoot>
+        </table>
 
 
-    <form asp-action="FinishPayment" asp-controller="Payment" method="post">
-        <input type="submit" value="Pay!" class="btn-submit" style="float: right; margin-right: 10px;margin-bottom:20px;"
-               asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-total="@ViewBag.total_price" asp-action="FinishPayment" asp-controller="Payment" />
-    </form>
-    <form asp-action="CartPage" asp-controller="Cart">
-        <button type="submit" class="btn-cancel" style="float: right; margin-right: 10px;margin-bottom:20px;">Cancel</button>
-    </form>
+        <form asp-action="FinishPayment" asp-controller="Payment" method="post">
+            <button type="submit" class="styledButton" style="float:right;margin-right:10px;margin-bottom:20px; --clr:#00ff21" 
+                    asp-route-furnitures="@JsonConvert.SerializeObject(Model)" asp-route-total="@ViewBag.total_price" asp-action="FinishPayment" asp-controller="Payment"
+                    ><span>Pay!</span><i></i></button>
+        </form>
+        <form asp-action="CartPage" asp-controller="Cart">
+            <button type="submit" class="styledButton" style="float: right; margin-right: 10px; margin-bottom: 20px; --clr: #ff0000"><span>Cancel</span><i></i></button>
+        </form>
 
 
-}
+    }
+
+</body>

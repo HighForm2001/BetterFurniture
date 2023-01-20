@@ -2,7 +2,7 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
-
+  
 
 function addToCart(btn) {
     // Get the itemId from the button's data attribute
@@ -30,4 +30,11 @@ function addToCart(btn) {
     });
 }
 
-
+function searchBox() {
+    var searchBox = document.querySelector(".searchBox");
+    searchBox.classList.add('active');
+}
+function closeBox() {
+    var searchBox = document.querySelector(".searchBox");
+    searchBox.classList.remove('active');
+}

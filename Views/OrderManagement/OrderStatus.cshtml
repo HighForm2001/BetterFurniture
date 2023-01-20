@@ -2,49 +2,50 @@
 @{
     ViewData["Title"] = "OrderStatus";
 }
+<body>
+    <h1 class="title order">OrderStatus</h1>
 
-<h1 class="title order">OrderStatus</h1>
-
-@if (Model.Count == 0)
-{
-    <h4 class="alert-info">You did not purchase any item yet. Click <a asp-controller="Home" asp-action="Index">here</a> to purchase item!</h4>
-}
-else
-{
-<table class="table-custom">
-    <thead>
-        <tr>
-            <th class="row-content">Order ID</th>
-            <th class="row-content">Customer Name</th>
-            <th class="row-content">Shipping Address</th>
-            <th class="row-content">Email</th>
-            <th class="row-content">Phone Number</th>
-            <th class="row-content">Status</th>
-            <th class="row-content">Item Name</th>
-            <th class="row-content">Total Price</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
-        {
-            <tr>
-                <td class="row-content">@order.OrderID</td>
-                <td class="row-content">@order.CustomerName</td>
-                <td class="row-content">@order.ShippingAddress</td>
-                <td class="row-content">@order.CustomerEmail</td>
-                <td class="row-content">@order.CustomerPhone</td>
-                <td class="row-content">@order.Status</td>
-                <td>
-                    <ul>
-                        @foreach (var item in order.ItemName)
-                        {
-                            <li class="row-content">@item</li>
-                        }
-                    </ul>
-                </td>
-                <td class="row-content">@order.TotalPrice</td>
-            </tr>
-        }
-    </tbody>
-</table>
-}
+    @if (Model.Count == 0)
+    {
+        <h4 class="alert-info">You did not purchase any item yet. Click <a asp-controller="Home" asp-action="Index">here</a> to purchase item!</h4>
+    }
+    else
+    {
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th class="row-content">Order ID</th>
+                    <th class="row-content">Customer Name</th>
+                    <th class="row-content">Shipping Address</th>
+                    <th class="row-content">Email</th>
+                    <th class="row-content">Phone Number</th>
+                    <th class="row-content">Status</th>
+                    <th class="row-content">Item Name</th>
+                    <th class="row-content">Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td class="row-content">@order.OrderID</td>
+                        <td class="row-content">@order.CustomerName</td>
+                        <td class="row-content">@order.ShippingAddress</td>
+                        <td class="row-content">@order.CustomerEmail</td>
+                        <td class="row-content">@order.CustomerPhone</td>
+                        <td class="row-content">@order.Status</td>
+                        <td>
+                            <ul>
+                                @foreach (var item in order.ItemName)
+                                {
+                                    <li class="row-content">@item</li>
+                                }
+                            </ul>
+                        </td>
+                        <td class="row-content">@order.TotalPrice</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</body>

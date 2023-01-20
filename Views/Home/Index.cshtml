@@ -4,49 +4,95 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center title home">
-    <h1 class="display-4">BETTERFURNITURE</h1>
-    <div id="update_succesful_id" style="color:lawngreen">@TempData["update"]</div>
-</div>
 
-<form method="get" class="search search-form" action="@Url.Action("Search", "Home")">
-    <input type="text" name="query" class="search search-bar" placeholder="Search for furniture">
-    <input type="submit" class="search search-button" value="Search">
-</form>
 
-@if (Model.Count > 0)
-{
-    <div id="update_succesful_id"></div>
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
+<h1 id="test"></h1>
+<body>
+    <div class="text-center title home">
+        <h1 class="display-4">BETTERFURNITURE</h1>
+        <div id="update_succesful_id" style="color:lawngreen">@TempData["update"]</div>
+    </div>
+    <div class="searchBox" >
+        <div class="search" onclick="searchBox()"><ion-icon name="search-outline"></ion-icon></div>
+        <div class="searchInput">
+            <form method="get" class="search search-form" action="@Url.Action("Search", "Home")">
+                <input class="search-text" type="text" name="query" placeholder="Search for furniture">
+            </form>
+        </div>
+        <div class="close" onclick="closeBox()"><ion-icon name="close-outline"></ion-icon></div>
+    </div>
+    @if (Model.Count > 0)
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
 
-                        </h5>
-                        <p class="card-text">@item.Description</p>
-                        <p class="card-text">@item.Price</p>
-                        @if (item.Quantity > 0)
-                        {
-                            <button class="btn btn-primary addToCartBtn" data-itemId="@item.Name" onclick="addToCart(this)">Add to Cart</button>
-                        }
-                        else
-                        {
-                            <button disabled class="out-of-stock-button">Out of Stock!</button>
-                        }
+                            </h5>
+                            <p class="card-text">@item.Description</p>
+                            <p class="card-text">@item.Price</p>
+                            @if (item.Quantity > 0)
+                            {
+                                <button class="styledButton" style="--clr:#1e9bff" data-itemId="@item.Name" onclick="addToCart(this)"><span>Add to Cart</span><i></i></button>
+                            }
+                            else
+                            {
+                                <button class="styledButton" style="--clr:#1e9bff" disabled><span>Out of Stock!</span><i></i></button>
+                            }
 
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+        </div>
+    }
+    else
+    {
+        <span style="color:red">@TempData["msg"]</span>
+    }
+    @*@if (Model.Count > 0)
+        {
+            @foreach (var item in Model)
+            {
+                <div class="container">
+                    <div class="card">
+                        <div class="lines"></div>
+                        <div class="imgBx">
+                            <img src="@item.ImageUrls.Split(",")[0]" class="card-img-top" alt="...">
+                        </div>
+                        <div class="content">
+                            <div class="details">
+                                <h2>
+                                    <a asp-action="ProductDetails" asp-controller="Product" asp-route-furniture="@JsonConvert.SerializeObject(item)">@item.Name</a>
+                                </h2>
+                                <p>@item.Description</p>
+                                <p>RM @item.Price</p>
+                                @if (item.Quantity > 0)
+                                {
+                                    <button class="btn btn-primary addToCartBtn" data-itemId="@item.Name" onclick="addToCart(this)">Add to Cart</button>
+                                }
+                                else
+                                {
+                                    <button disabled class="out-of-stock-button">Out of Stock!</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
         }
-    </div>
-}
-else
-{
-    <span style="color:red">@TempData["msg"]</span>
-}
+        else
+        {
+            <span style="color:red">@TempData["msg"]</span>
+        }*@
+  
+
+</body>
+
 
