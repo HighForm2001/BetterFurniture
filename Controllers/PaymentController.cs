@@ -103,6 +103,7 @@ namespace BetterFurniture.Controllers
                     Order order = new Order();
                     order.OrderID = item["OrderID"].S;
                     order.CustomerEmail = item["CustomerEmail"].S;
+                    order.CustomerID = item["CustomerId"].S;
                     order.CustomerName = item["CustomerName"].S;
                     order.CustomerPhone = item["CustomerPhone"].S;
                     order.ItemName = item["ItemName"].L.Select(av => av.S).ToList();
@@ -130,6 +131,7 @@ namespace BetterFurniture.Controllers
                 Dictionary<string, AttributeValue> item = new Dictionary<string, AttributeValue>
                 {
                     { "OrderID",new AttributeValue{S=uniqueId} },
+                    {"CustomerId",new AttributeValue{S=user.Id } },
                     {"CustomerName",new AttributeValue{S=user.CustomerFullName} },
                     { "ShippingAddress",new AttributeValue{S=user.CustomerAddress } },
                     { "CustomerEmail",new AttributeValue{S=user.Email } }, // need to edit

@@ -76,12 +76,12 @@ namespace BetterFurniture.Controllers
         public async Task<IActionResult> OrderStatus()
         {
             BetterFurnitureUser user = await _userManager.GetUserAsync(HttpContext.User);
-            string userName = user.CustomerFullName;
+            string ID = user.Id;
             List<Order> selected_orders = new List<Order>();
             List<Order> all_orders = await getOrders();
             foreach(var order in all_orders)
             {
-                if (order.CustomerName.Equals(userName))
+                if (order.CustomerID.Equals(ID))
                     selected_orders.Add(order);
             }
             return View(selected_orders);
@@ -136,6 +136,7 @@ namespace BetterFurniture.Controllers
                 {
                     Order order = new Order();
                     order.CustomerName = item["CustomerName"].S;
+                    order.CustomerID = item["CustomerId"].S;
                     order.OrderID = item["OrderID"].S;
                     order.ShippingAddress = item["ShippingAddress"].S;
                     order.CustomerEmail = item["CustomerEmail"].S;

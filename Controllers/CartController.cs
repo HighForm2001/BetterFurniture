@@ -35,9 +35,9 @@ namespace BetterFurniture.Controllers
         public async Task<IActionResult> CartPage()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            string customerName = user.CustomerFullName;
+            string customerId = user.Id;
             List<Cart> carts = await getCarts();
-            Cart cart = carts.Find(x => x.CustomerName.Equals(customerName));
+            Cart cart = carts.Find(x => x.CustomerId.Equals(customerId));
             if (cart == null)
                 ViewBag.Msg = "Your cart is empty. Add some product into your cart now!";
             else

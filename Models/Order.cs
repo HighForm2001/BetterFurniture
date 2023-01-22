@@ -9,6 +9,7 @@ namespace BetterFurniture.Models
     public class Order
     {
         public string OrderID { get; set; }
+        public string CustomerID { get; set; }
         public string CustomerName { get; set; }
         public string ShippingAddress { get; set; }
         public string CustomerPhone { get; set; }
